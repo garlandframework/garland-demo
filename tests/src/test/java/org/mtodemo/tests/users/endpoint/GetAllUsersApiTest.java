@@ -1,0 +1,41 @@
+package org.mtodemo.tests.users.endpoint;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import org.modulartestorchestrator.base.Pipeline;
+import org.modulartestorchestrator.base.checks.Verify;
+import org.mtodemo.tests.dto.UserDto;
+import org.mtodemo.tests.factory.TestUserRequests;
+import org.mtodemo.tests.infrastructure.BaseTest;
+import org.testng.annotations.Test;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+public class GetAllUsersApiTest extends BaseTest {
+
+    @Test(description = "GET /api/users returns 200 and empty list when no users exist")
+    public void getAllUsers_emptyDatabase_returnsEmptyList() throws Exception {
+        List<UserDto> all = Pipeline.given(TestUserRequests.getAllUsers())
+                .then(httpClient.makeCall(200, new TypeReference<List<UserDto>>() {}))
+                .execute();
+
+        assertThat(all).isNotNull();
+    }
+
+    @Test(description = "GET /api/users returns 200 and the list contains all previously created users")
+    public void getAllUsers_containsCreatedUsers() throws Exception {
+        UserDto first = Pipeline.given(TestUserRequests.createUser())
+                .then(httpClient.makeCall(201, UserDto.class))
+                .execute();
+
+        UserDto second = Pipeline.given(TestUserRequests.createUser())
+                .then(httpClient.makeCall(201, UserDto.class))
+                .execute();
+
+        Pipeline.given(TestUserRequests.getAllUsers())
+                .then(httpClient.makeCall(200, new TypeReference<List<UserDto>>() {}))
+                .then(Verify.containsAll(List.of(first, second)))
+                .execute();
+    }
+}
