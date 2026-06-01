@@ -11,7 +11,7 @@ Examples:
 - `/gen-e2e-test UserEndToEndTest — update propagates to MongoDB`
 - `/gen-e2e-test UserEndToEndTest — delete removes from all systems`
 
-Universal framework rules are in `llm.md` in the MTO repo root.
+Read `/Users/volodymyrkobryn/ModularTestOrchestrator/ModularTestOrchestrator/untitled/llm.md` first — it contains universal framework rules (pipeline syntax, Verify.allOf, temporal tolerance, anti-patterns).
 The rules below are specific to this project.
 
 ---
@@ -58,30 +58,27 @@ A full e2e test walks this entire chain in order. Each system is asserted explic
 
 **One pipeline per logical operation.** State (UUID, DTO, entity) is carried between pipelines via local variables — not through context.
 
-### Create flow — single pipeline walks the full chain
+### Create / update flow — fan out with Verify.allOf()
+
+After the HTTP call, use `Verify.allOf()` to fan out to all independent side-effect assertions in one step. All branches receive the same `UserDto` result. All failures are reported together.
 
 ```java
 @Test(description = "Creating a user triggers full system flow: Postgres persistence, Kafka event, and MongoDB projection")
-public void createUser_fullSystemFlow() throws Exception {
+public void createUser_fullSystemFlow() {
     Pipeline.given(TestUserRequests.createUser())
             .then(httpClient.makeCall(201, UserDto.class))
-            .then(UserTestMapper.toEntity())
-            .then(dbClient.findById())
-            .then(UserTestMapper.entityToCreatedEvent())
-            .then(kafkaClient.consumeMatching(UserCreatedEvent.class))
-            .then(UserTestMapper.toProjectionDoc())
-            .then(mongoClient.findById(Duration.ofMillis(1)))
+            .then(Verify.allOf(
+                    UserTestMapper.toEntity().andThen(dbClient.findById()),
+                    UserTestMapper.toCreatedEvent().andThen(kafkaClient.consumeMatching(UserCreatedEvent.class)),
+                    UserTestMapper.dtoToCreatedProjectionDoc().andThen(mongoClient.findById())
+            ))
             .execute();
 }
 ```
 
-The single pipeline works because each step's output is the next step's input in a linear chain.
-
-### Update flow — two pipelines: setup then assert
-
 ```java
 @Test(description = "Updating a user triggers full system flow: Postgres updated, UserUpdatedEvent published to Kafka, MongoDB projection updated")
-public void updateUser_fullSystemFlow() throws Exception {
+public void updateUser_fullSystemFlow() {
     UserDto created = Pipeline.given(TestUserRequests.createUser())
             .then(httpClient.makeCall(201, UserDto.class))
             .execute();
@@ -89,51 +86,39 @@ public void updateUser_fullSystemFlow() throws Exception {
     UserDto updatePayload = TestUsers.defaultUser();
     Pipeline.given(TestUserRequests.updateUser(created.getUuid(), updatePayload))
             .then(httpClient.makeCall(200, UserDto.class))
-            .then(UserTestMapper.toEntity())
-            .then(dbClient.findById())
-            .then(UserTestMapper.entityToUpdatedEvent())
-            .then(kafkaClient.consumeMatching(UserUpdatedEvent.class))
-            .then(UserTestMapper.toUpdatedProjectionDoc())
-            .then(mongoClient.findById(Duration.ofMillis(1)))
+            .then(Verify.allOf(
+                    UserTestMapper.toEntity().andThen(dbClient.findById()),
+                    UserTestMapper.toUpdatedEvent().andThen(kafkaClient.consumeMatching(UserUpdatedEvent.class)),
+                    UserTestMapper.dtoToUpdatedProjectionDoc().andThen(mongoClient.findById())
+            ))
             .execute();
 }
 ```
 
-Setup (create) is a separate pipeline. Its result is captured to a local variable and reused in the main pipeline.
+### Delete flow — delete call, then allOf on captured DTO
 
-### Delete flow — four separate pipelines: one per assertion
+The delete returns `Void`, so start a new pipeline from the pre-delete `created` DTO and fan out to verify absence in all systems.
 
 ```java
 @Test(description = "Deleting a user triggers full system flow: removed from Postgres, UserDeletedEvent published to Kafka, MongoDB projection removed")
-public void deleteUser_fullSystemFlow() throws Exception {
+public void deleteUser_fullSystemFlow() {
     UserDto created = Pipeline.given(TestUserRequests.createUser())
             .then(httpClient.makeCall(201, UserDto.class))
             .execute();
-
-    // Pre-compute expected state BEFORE deletion — the entity/doc will no longer be retrievable after
-    UserEntity expectedEntity = UserTestMapper.INSTANCE.toEntity(created);
-    UserProjectionDoc expectedDoc = UserTestMapper.INSTANCE.toProjectionDoc(
-            UserTestMapper.INSTANCE.toCreatedEvent(created));
 
     Pipeline.given(TestUserRequests.deleteUser(created.getUuid()))
             .then(httpClient.makeCall(204, Void.class))
             .execute();
 
-    Pipeline.given(expectedEntity)
-            .then(dbClient.notExistsById())
-            .execute();
-
-    Pipeline.given(new UserDeletedEvent(created.getUuid(), null))
-            .then(kafkaClient.consumeMatching(UserDeletedEvent.class))
-            .execute();
-
-    Pipeline.given(expectedDoc)
-            .then(mongoClient.notExistsById())
+    Pipeline.given(created)
+            .then(Verify.allOf(
+                    UserTestMapper.toEntity().andThen(dbClient.notExistsById()),
+                    UserTestMapper.toDeletedEvent().andThen(kafkaClient.consumeMatching(UserDeletedEvent.class)),
+                    UserTestMapper.dtoToCreatedProjectionDoc().andThen(mongoClient.notExistsById())
+            ))
             .execute();
 }
 ```
-
-Four pipelines because the four assertions (HTTP, Postgres, Kafka, MongoDB) are independent — they cannot be chained linearly. Pre-compute the expected entity and doc before the delete, because after deletion the live data is gone.
 
 ## Mapper steps (pipeline-compatible)
 
@@ -144,37 +129,55 @@ UserTestMapper.toEntity()
 // UserDto → UserCreatedEvent
 UserTestMapper.toCreatedEvent()
 
+// UserDto → UserUpdatedEvent
+UserTestMapper.toUpdatedEvent()
+
+// UserDto → UserDeletedEvent
+UserTestMapper.toDeletedEvent()
+
+// UserDto → UserProjectionDoc (via toCreatedEvent internally)
+UserTestMapper.dtoToCreatedProjectionDoc()
+
+// UserDto → UserProjectionDoc (via toUpdatedEvent internally)
+UserTestMapper.dtoToUpdatedProjectionDoc()
+
 // UserEntity → UserCreatedEvent
 UserTestMapper.entityToCreatedEvent()
 
 // UserCreatedEvent → UserProjectionDoc
 UserTestMapper.toProjectionDoc()
 
-// UserDto → UserUpdatedEvent
-// (used to map HTTP response body to expected event shape)
-
-// UserEntity → UserUpdatedEvent
-UserTestMapper.entityToUpdatedEvent()
-
-// UserUpdatedEvent → UserProjectionDoc (overload for update flow)
+// UserUpdatedEvent → UserProjectionDoc
 UserTestMapper.toUpdatedProjectionDoc()
-
-// Direct mapper calls (not pipeline steps):
-UserTestMapper.INSTANCE.toEntity(UserDto)
-UserTestMapper.INSTANCE.toProjectionDoc(UserCreatedEvent)
-UserTestMapper.INSTANCE.toCreatedEvent(UserDto)
 ```
+
+Always use the static bridges on the mapper interface (not `StepFunction.lift(INSTANCE::toEntity)`) — the mapper has overloaded methods and type inference will fail for overloaded references.
 
 ## DB and MongoDB assertion steps
 
 ```java
 dbClient.findById()                           // asserts record exists and matches — throws if absent
 dbClient.findById(Duration temporalTolerance) // same with timestamp tolerance (Postgres precision)
+dbClient.findByFields()                       // asserts unique match — throws if 0 or >1 results
+dbClient.countByFields()                      // returns Long count of matching records
 dbClient.notExistsById()                      // asserts record is absent — throws if present
 
 mongoClient.findById()                            // asserts document exists and matches — throws if absent
 mongoClient.findById(Duration temporalTolerance)  // same with timestamp tolerance — use for any doc with timestamp fields
+mongoClient.findByFields()                        // asserts unique match — throws if 0 or >1 results
+mongoClient.countByFields()                       // returns Long count of matching documents
 mongoClient.notExistsById()                       // asserts document is absent — throws if present
+```
+
+To verify a count of records matching a field pattern:
+
+```java
+Car template = new Car(null, null, "Toyota", null); // only non-null fields are used as filter
+
+Pipeline.given(template)
+    .then(db.countByFields())
+    .then(check.equalTo(5L))
+    .execute();
 ```
 
 Always use `mongoClient.findById(Duration.ofMillis(1))` when the expected document contains a timestamp field — MongoDB truncates nanoseconds to milliseconds and exact comparison will fail.
@@ -230,9 +233,8 @@ TestUsers.requiredFieldsOnlyUser()         // name + surname only
 
 ```java
 import org.modulartestorchestrator.base.Pipeline;
-import org.mtodemo.tests.document.UserProjectionDoc;
+import org.modulartestorchestrator.base.checks.Verify;
 import org.mtodemo.tests.dto.UserDto;
-import org.mtodemo.tests.entity.UserEntity;
 import org.mtodemo.tests.event.UserCreatedEvent;
 import org.mtodemo.tests.event.UserDeletedEvent;
 import org.mtodemo.tests.event.UserUpdatedEvent;

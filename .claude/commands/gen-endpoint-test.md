@@ -9,7 +9,7 @@ Examples:
 - `/gen-endpoint-test DeleteUserApiTest — full suite`
 - `/gen-endpoint-test GetAllUsersApiTest — pagination happy path`
 
-Universal framework rules are in `llm.md` in the MTO repo root.
+Read `/Users/volodymyrkobryn/ModularTestOrchestrator/ModularTestOrchestrator/untitled/llm.md` first — it contains universal framework rules (pipeline syntax, Verify.allOf, temporal tolerance, anti-patterns).
 The rules below are specific to this project — real users replace these with their own factories, mappers, and constraints.
 
 ---
@@ -92,6 +92,31 @@ UserTestMapper.toEntity()             // UserDto → UserEntity (sets id for DB 
 UserTestMapper.toCreatedEvent()       // UserDto → UserCreatedEvent (for Kafka)
 UserTestMapper.entityToCreatedEvent() // UserEntity → UserCreatedEvent
 UserTestMapper.toProjectionDoc()      // UserDto → UserProjectionDoc (for MongoDB)
+```
+
+## DB / Mongo assertion steps
+
+```java
+dbClient.findById()                           // asserts record exists and matches — throws if absent
+dbClient.findByFields()                       // asserts unique match — throws if 0 or >1 results
+dbClient.countByFields()                      // returns Long count of matching records
+dbClient.notExistsById()                      // asserts record is absent — throws if present
+
+mongoClient.findById()                            // asserts document exists and matches — throws if absent
+mongoClient.findByFields()                        // asserts unique match — throws if 0 or >1 results
+mongoClient.countByFields()                       // returns Long count of matching documents
+mongoClient.notExistsById()                       // asserts document is absent — throws if present
+```
+
+To verify a count of records matching a field pattern:
+
+```java
+Car template = new Car(null, null, "Toyota", null); // only non-null fields used as filter
+
+Pipeline.given(template)
+    .then(db.countByFields())
+    .then(check.equalTo(5L))
+    .execute();
 ```
 
 ## Temporal tolerance in HTTP responses

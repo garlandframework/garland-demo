@@ -10,7 +10,7 @@ Examples:
 - `/gen-component-test UserApiToKafkaTest — create user publishes event`
 - `/gen-component-test KafkaToProjectionTest — event projected to MongoDB`
 
-Universal framework rules are in `llm.md` in the MTO repo root.
+Read `/Users/volodymyrkobryn/ModularTestOrchestrator/ModularTestOrchestrator/untitled/llm.md` first — it contains universal framework rules (pipeline syntax, Verify.allOf, temporal tolerance, anti-patterns).
 The rules below are specific to this project.
 
 ---
@@ -38,13 +38,13 @@ Does not assert MongoDB — that is projection-service's responsibility.
 
 ```java
 @Test(description = "Creating a user via HTTP persists it in Postgres and publishes a matching UserCreated event to Kafka")
-public void createUser_persistedInDb_andPublishesKafkaEvent() throws Exception {
+public void createUser_persistedInDb_andPublishesKafkaEvent() {
     Pipeline.given(TestUserRequests.createUser())
             .then(httpClient.makeCall(201, UserDto.class))
-            .then(UserTestMapper.toEntity())
-            .then(dbClient.findById())
-            .then(UserTestMapper.entityToCreatedEvent())
-            .then(kafkaClient.consumeMatching(UserCreatedEvent.class))
+            .then(Verify.allOf(
+                    UserTestMapper.toEntity().andThen(dbClient.findById()),
+                    UserTestMapper.toCreatedEvent().andThen(kafkaClient.consumeMatching(UserCreatedEvent.class))
+            ))
             .execute();
 }
 ```
@@ -55,7 +55,7 @@ Does not go through HTTP — uses `TestEvents` to build the event independently.
 
 ```java
 @Test(description = "A UserCreated Kafka event published directly is projected into MongoDB by the projection-service")
-public void userCreatedEvent_projectedToMongo() throws Exception {
+public void userCreatedEvent_projectedToMongo() {
     UserCreatedEvent event = TestEvents.defaultUserCreatedEvent();
 
     Pipeline.given(new KafkaMessage<>(event.userId().toString(), event))
@@ -72,6 +72,17 @@ public void userCreatedEvent_projectedToMongo() throws Exception {
 Two pipelines: one to publish the event, one to assert the projection. The split reflects two distinct operations.
 
 **MongoDB precision** — always use `mongoClient.findById(Duration.ofMillis(1))` when the expected document contains a timestamp field. MongoDB truncates `Instant` nanoseconds to milliseconds; exact comparison will fail without tolerance.
+
+**Counting records by field** — use `countByFields()` + `check.equalTo(NL)` when asserting how many documents/rows match a field pattern. `findByFields()` is strict and throws if more than one result is found — use it only when you expect exactly one match.
+
+```java
+UserProjectionDoc template = new UserProjectionDoc(null, "Toyota", null); // only non-null fields used as filter
+
+Pipeline.given(template)
+    .then(mongoClient.countByFields())
+    .then(check.equalTo(5L))
+    .execute();
+```
 
 **Important — Kafka client selection:** `publish()` always sends to the first topic registered in the client. For order events (e.g. `order.placed`), use `orderKafkaClient.publish()` — not `kafkaClient.publish()`, which would send to `user.created`.
 
@@ -102,6 +113,7 @@ Component tests share the Kafka topic with other test levels. Run them sequentia
 
 ```java
 import org.modulartestorchestrator.base.Pipeline;
+import org.modulartestorchestrator.base.checks.Verify;
 import org.modulartestorchestrator.kafka.model.KafkaMessage;
 import org.mtodemo.tests.document.UserProjectionDoc;
 import org.mtodemo.tests.dto.UserDto;
