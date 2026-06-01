@@ -14,7 +14,7 @@ import org.testng.annotations.Test;
 public class OrderFlowTest extends BaseTest {
 
     @Test(description = "Placed order can be retrieved by id with all original data intact")
-    public void placeThenGetById_orderRetrievable() throws Exception {
+    public void placeThenGetById_orderRetrievable() {
         UserDto user = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();
@@ -31,7 +31,7 @@ public class OrderFlowTest extends BaseTest {
     }
 
     @Test(description = "Cancelled order is reflected as CANCELLED when retrieved by id")
-    public void placeThenCancel_thenGetById_statusIsCancelled() throws Exception {
+    public void placeThenCancel_thenGetById_statusIsCancelled() {
         UserDto user = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();

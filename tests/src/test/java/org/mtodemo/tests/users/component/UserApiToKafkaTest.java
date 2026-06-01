@@ -11,7 +11,7 @@ import org.testng.annotations.Test;
 public class UserApiToKafkaTest extends BaseTest {
 
     @Test(description = "Creating a user via HTTP persists it in Postgres and publishes a matching UserCreated event to Kafka")
-    public void createUser_persistedInDb_andPublishesKafkaEvent() throws Exception {
+    public void createUser_persistedInDb_andPublishesKafkaEvent() {
         Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .then(UserTestMapper.toEntity())

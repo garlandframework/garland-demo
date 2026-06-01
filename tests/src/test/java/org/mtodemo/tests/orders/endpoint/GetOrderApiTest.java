@@ -22,7 +22,7 @@ public class GetOrderApiTest extends BaseTest {
     // --- GET /api/orders/{id} ---
 
     @Test(description = "GET /api/orders/{id} with non-existent id returns 404 with error body")
-    public void getOrderById_notFound() throws Exception {
+    public void getOrderById_notFound() {
         Pipeline.given(TestOrderRequests.getOrder(UUID.randomUUID()))
                 .then(httpClient.makeCall(404, ErrorDto.class))
                 .then(Verify.matching(ErrorDto.withStatus(404)))
@@ -30,7 +30,7 @@ public class GetOrderApiTest extends BaseTest {
     }
 
     @Test(description = "GET /api/orders/{id} returns 200 and the order data matching the placed order")
-    public void getOrderById_returnsCorrectOrder() throws Exception {
+    public void getOrderById_returnsCorrectOrder() {
         UserDto user = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();
@@ -49,7 +49,7 @@ public class GetOrderApiTest extends BaseTest {
     // --- GET /api/orders/user/{userId} ---
 
     @Test(description = "GET /api/orders/user/{userId} returns 200 and list containing orders placed by that user")
-    public void getOrdersByUser_returnsPlacedOrders() throws Exception {
+    public void getOrdersByUser_returnsPlacedOrders() {
         UserDto user = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();
@@ -71,7 +71,7 @@ public class GetOrderApiTest extends BaseTest {
     }
 
     @Test(description = "GET /api/orders/user/{userId} with a userId that has no orders returns 200 and empty list")
-    public void getOrdersByUser_unknownUser_returnsEmptyList() throws Exception {
+    public void getOrdersByUser_unknownUser_returnsEmptyList() {
         List<OrderDto> orders = Pipeline.given(TestOrderRequests.getOrdersByUser(UUID.randomUUID()))
                 .then(httpClient.makeCall(200, new TypeReference<List<OrderDto>>() {}))
                 .execute();

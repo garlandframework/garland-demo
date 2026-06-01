@@ -15,7 +15,7 @@ import java.util.UUID;
 public class DeleteUserApiTest extends BaseTest {
 
     @Test(description = "DELETE /api/users/{id} with non-existent id returns 404 with error body")
-    public void deleteUser_notFound() throws Exception {
+    public void deleteUser_notFound() {
         Pipeline.given(TestUserRequests.deleteUser(UUID.randomUUID()))
                 .then(httpClient.makeCall(404, ErrorDto.class))
                 .then(Verify.matching(ErrorDto.withStatus(404)))
@@ -23,7 +23,7 @@ public class DeleteUserApiTest extends BaseTest {
     }
 
     @Test(description = "DELETE /api/users/{id} returns 204 and user is no longer present in Postgres")
-    public void deleteUser_removedFromDb() throws Exception {
+    public void deleteUser_removedFromDb() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();

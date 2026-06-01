@@ -19,7 +19,7 @@ import java.util.UUID;
 public class UpdateUserApiTest extends BaseTest {
 
     @Test(description = "PUT /api/users/{id} with valid data returns 200 and changes are persisted in Postgres")
-    public void updateUser_persistedInDb() throws Exception {
+    public void updateUser_persistedInDb() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();
@@ -34,7 +34,7 @@ public class UpdateUserApiTest extends BaseTest {
     }
 
     @Test(description = "PUT /api/users/{id} with required fields only returns 200 and clears optional fields in Postgres")
-    public void updateUser_requiredFieldsOnly_clearsOptionalFields() throws Exception {
+    public void updateUser_requiredFieldsOnly_clearsOptionalFields() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();
@@ -51,7 +51,7 @@ public class UpdateUserApiTest extends BaseTest {
     // --- not found ---
 
     @Test(description = "PUT /api/users/{id} with non-existent id returns 404 with error body")
-    public void updateUser_nonExistentId_returns404() throws Exception {
+    public void updateUser_nonExistentId_returns404() {
         Pipeline.given(TestUserRequests.updateUser(UUID.randomUUID(), TestUsers.defaultUser()))
                 .then(httpClient.makeCall(404, ErrorDto.class))
                 .then(Verify.matching(ErrorDto.withStatus(404)))
@@ -61,7 +61,7 @@ public class UpdateUserApiTest extends BaseTest {
     // --- required fields ---
 
     @Test(description = "Blank name is rejected with 400 and error pointing to 'name' field")
-    public void updateUser_blankName_returns400() throws Exception {
+    public void updateUser_blankName_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();
@@ -73,7 +73,7 @@ public class UpdateUserApiTest extends BaseTest {
     }
 
     @Test(description = "Null name is rejected with 400 and error pointing to 'name' field")
-    public void updateUser_nullName_returns400() throws Exception {
+    public void updateUser_nullName_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();
@@ -85,7 +85,7 @@ public class UpdateUserApiTest extends BaseTest {
     }
 
     @Test(description = "Blank surname is rejected with 400 and error pointing to 'surname' field")
-    public void updateUser_blankSurname_returns400() throws Exception {
+    public void updateUser_blankSurname_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();
@@ -97,7 +97,7 @@ public class UpdateUserApiTest extends BaseTest {
     }
 
     @Test(description = "Null surname is rejected with 400 and error pointing to 'surname' field")
-    public void updateUser_nullSurname_returns400() throws Exception {
+    public void updateUser_nullSurname_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();
@@ -109,7 +109,7 @@ public class UpdateUserApiTest extends BaseTest {
     }
 
     @Test(description = "Blank address street is rejected with 400 and error pointing to 'address.street' field")
-    public void updateUser_blankAddressStreet_returns400() throws Exception {
+    public void updateUser_blankAddressStreet_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();
@@ -124,7 +124,7 @@ public class UpdateUserApiTest extends BaseTest {
     }
 
     @Test(description = "Null address street is rejected with 400 and error pointing to 'address.street' field")
-    public void updateUser_nullAddressStreet_returns400() throws Exception {
+    public void updateUser_nullAddressStreet_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();
@@ -139,7 +139,7 @@ public class UpdateUserApiTest extends BaseTest {
     }
 
     @Test(description = "Blank address city is rejected with 400 and error pointing to 'address.city' field")
-    public void updateUser_blankAddressCity_returns400() throws Exception {
+    public void updateUser_blankAddressCity_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();
@@ -154,7 +154,7 @@ public class UpdateUserApiTest extends BaseTest {
     }
 
     @Test(description = "Null address city is rejected with 400 and error pointing to 'address.city' field")
-    public void updateUser_nullAddressCity_returns400() throws Exception {
+    public void updateUser_nullAddressCity_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();
@@ -169,7 +169,7 @@ public class UpdateUserApiTest extends BaseTest {
     }
 
     @Test(description = "Blank address country is rejected with 400 and error pointing to 'address.country' field")
-    public void updateUser_blankAddressCountry_returns400() throws Exception {
+    public void updateUser_blankAddressCountry_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();
@@ -184,7 +184,7 @@ public class UpdateUserApiTest extends BaseTest {
     }
 
     @Test(description = "Null address country is rejected with 400 and error pointing to 'address.country' field")
-    public void updateUser_nullAddressCountry_returns400() throws Exception {
+    public void updateUser_nullAddressCountry_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();
@@ -199,7 +199,7 @@ public class UpdateUserApiTest extends BaseTest {
     }
 
     @Test(description = "Blank address zip code is rejected with 400 and error pointing to 'address.zipCode' field")
-    public void updateUser_blankAddressZipCode_returns400() throws Exception {
+    public void updateUser_blankAddressZipCode_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();
@@ -214,7 +214,7 @@ public class UpdateUserApiTest extends BaseTest {
     }
 
     @Test(description = "Null address zip code is rejected with 400 and error pointing to 'address.zipCode' field")
-    public void updateUser_nullAddressZipCode_returns400() throws Exception {
+    public void updateUser_nullAddressZipCode_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();
@@ -229,7 +229,7 @@ public class UpdateUserApiTest extends BaseTest {
     }
 
     @Test(description = "Blank car plate number is rejected with 400 and error pointing to 'cars[0].plateNumber' field")
-    public void updateUser_blankCarPlateNumber_returns400() throws Exception {
+    public void updateUser_blankCarPlateNumber_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();
@@ -244,7 +244,7 @@ public class UpdateUserApiTest extends BaseTest {
     }
 
     @Test(description = "Null car plate number is rejected with 400 and error pointing to 'cars[0].plateNumber' field")
-    public void updateUser_nullCarPlateNumber_returns400() throws Exception {
+    public void updateUser_nullCarPlateNumber_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();
@@ -259,7 +259,7 @@ public class UpdateUserApiTest extends BaseTest {
     }
 
     @Test(description = "Blank car manufacturer is rejected with 400 and error pointing to 'cars[0].manufacturer' field")
-    public void updateUser_blankCarManufacturer_returns400() throws Exception {
+    public void updateUser_blankCarManufacturer_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();
@@ -274,7 +274,7 @@ public class UpdateUserApiTest extends BaseTest {
     }
 
     @Test(description = "Null car manufacturer is rejected with 400 and error pointing to 'cars[0].manufacturer' field")
-    public void updateUser_nullCarManufacturer_returns400() throws Exception {
+    public void updateUser_nullCarManufacturer_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();
@@ -289,7 +289,7 @@ public class UpdateUserApiTest extends BaseTest {
     }
 
     @Test(description = "Blank car model is rejected with 400 and error pointing to 'cars[0].model' field")
-    public void updateUser_blankCarModel_returns400() throws Exception {
+    public void updateUser_blankCarModel_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();
@@ -304,7 +304,7 @@ public class UpdateUserApiTest extends BaseTest {
     }
 
     @Test(description = "Null car model is rejected with 400 and error pointing to 'cars[0].model' field")
-    public void updateUser_nullCarModel_returns400() throws Exception {
+    public void updateUser_nullCarModel_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();
@@ -321,7 +321,7 @@ public class UpdateUserApiTest extends BaseTest {
     // --- size limits ---
 
     @Test(description = "Name exceeding 100 characters is rejected with 400 and error pointing to 'name' field")
-    public void updateUser_nameTooLong_returns400() throws Exception {
+    public void updateUser_nameTooLong_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();
@@ -333,7 +333,7 @@ public class UpdateUserApiTest extends BaseTest {
     }
 
     @Test(description = "Surname exceeding 100 characters is rejected with 400 and error pointing to 'surname' field")
-    public void updateUser_surnameTooLong_returns400() throws Exception {
+    public void updateUser_surnameTooLong_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();
@@ -345,7 +345,7 @@ public class UpdateUserApiTest extends BaseTest {
     }
 
     @Test(description = "Address street exceeding 255 characters is rejected with 400 and error pointing to 'address.street' field")
-    public void updateUser_addressStreetTooLong_returns400() throws Exception {
+    public void updateUser_addressStreetTooLong_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();
@@ -360,7 +360,7 @@ public class UpdateUserApiTest extends BaseTest {
     }
 
     @Test(description = "Address city exceeding 100 characters is rejected with 400 and error pointing to 'address.city' field")
-    public void updateUser_addressCityTooLong_returns400() throws Exception {
+    public void updateUser_addressCityTooLong_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();
@@ -375,7 +375,7 @@ public class UpdateUserApiTest extends BaseTest {
     }
 
     @Test(description = "Address country exceeding 100 characters is rejected with 400 and error pointing to 'address.country' field")
-    public void updateUser_addressCountryTooLong_returns400() throws Exception {
+    public void updateUser_addressCountryTooLong_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();
@@ -390,7 +390,7 @@ public class UpdateUserApiTest extends BaseTest {
     }
 
     @Test(description = "Address zip code exceeding 20 characters is rejected with 400 and error pointing to 'address.zipCode' field")
-    public void updateUser_addressZipCodeTooLong_returns400() throws Exception {
+    public void updateUser_addressZipCodeTooLong_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();
@@ -405,7 +405,7 @@ public class UpdateUserApiTest extends BaseTest {
     }
 
     @Test(description = "Car plate number exceeding 20 characters is rejected with 400 and error pointing to 'cars[0].plateNumber' field")
-    public void updateUser_carPlateNumberTooLong_returns400() throws Exception {
+    public void updateUser_carPlateNumberTooLong_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();
@@ -420,7 +420,7 @@ public class UpdateUserApiTest extends BaseTest {
     }
 
     @Test(description = "Car manufacturer exceeding 100 characters is rejected with 400 and error pointing to 'cars[0].manufacturer' field")
-    public void updateUser_carManufacturerTooLong_returns400() throws Exception {
+    public void updateUser_carManufacturerTooLong_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();
@@ -435,7 +435,7 @@ public class UpdateUserApiTest extends BaseTest {
     }
 
     @Test(description = "Car model exceeding 100 characters is rejected with 400 and error pointing to 'cars[0].model' field")
-    public void updateUser_carModelTooLong_returns400() throws Exception {
+    public void updateUser_carModelTooLong_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();

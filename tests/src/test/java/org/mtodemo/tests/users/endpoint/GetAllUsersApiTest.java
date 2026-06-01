@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class GetAllUsersApiTest extends BaseTest {
 
     @Test(description = "GET /api/users returns 200 and empty list when no users exist")
-    public void getAllUsers_emptyDatabase_returnsEmptyList() throws Exception {
+    public void getAllUsers_emptyDatabase_returnsEmptyList() {
         List<UserDto> all = Pipeline.given(TestUserRequests.getAllUsers())
                 .then(httpClient.makeCall(200, new TypeReference<List<UserDto>>() {}))
                 .execute();
@@ -24,7 +24,7 @@ public class GetAllUsersApiTest extends BaseTest {
     }
 
     @Test(description = "GET /api/users returns 200 and the list contains all previously created users")
-    public void getAllUsers_containsCreatedUsers() throws Exception {
+    public void getAllUsers_containsCreatedUsers() {
         UserDto first = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();

@@ -12,7 +12,7 @@ import org.testng.annotations.Test;
 public class KafkaToProjectionTest extends BaseTest {
 
     @Test(description = "A UserCreated Kafka event published directly is projected into MongoDB by the projection-service")
-    public void userCreatedEvent_projectedToMongo() throws Exception {
+    public void userCreatedEvent_projectedToMongo() {
         UserCreatedEvent event = TestEvents.defaultUserCreatedEvent();
 
         Pipeline.given(new KafkaMessage<>(event.userId().toString(), event))

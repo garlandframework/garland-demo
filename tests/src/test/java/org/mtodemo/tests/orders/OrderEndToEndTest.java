@@ -18,7 +18,7 @@ import java.time.Duration;
 public class OrderEndToEndTest extends BaseTest {
 
     @Test(description = "Placing an order triggers full system flow: persisted in Postgres, OrderPlaced event published to Kafka, projected into MongoDB")
-    public void placeOrder_fullSystemFlow() throws Exception {
+    public void placeOrder_fullSystemFlow() {
         UserDto user = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();
@@ -35,7 +35,7 @@ public class OrderEndToEndTest extends BaseTest {
     }
 
     @Test(description = "Cancelling an order triggers full system flow: Postgres updated to CANCELLED, OrderCancelled event published to Kafka, MongoDB projection updated to CANCELLED")
-    public void cancelOrder_fullSystemFlow() throws Exception {
+    public void cancelOrder_fullSystemFlow() {
         UserDto user = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();

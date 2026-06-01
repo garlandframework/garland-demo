@@ -19,7 +19,7 @@ public class UserFlowTest extends BaseTest {
     // --- read consistency ---
 
     @Test(description = "Created user can be retrieved by id")
-    public void createThenGet_userRetrievable() throws Exception {
+    public void createThenGet_userRetrievable() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();
@@ -31,7 +31,7 @@ public class UserFlowTest extends BaseTest {
     }
 
     @Test(description = "Created user appears in the full user list")
-    public void createThenGetAll_listContainsUser() throws Exception {
+    public void createThenGetAll_listContainsUser() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();
@@ -43,7 +43,7 @@ public class UserFlowTest extends BaseTest {
     }
 
     @Test(description = "Updated user data is reflected in subsequent GET by id")
-    public void createThenUpdate_thenGet_returnsUpdatedData() throws Exception {
+    public void createThenUpdate_thenGet_returnsUpdatedData() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();
@@ -60,7 +60,7 @@ public class UserFlowTest extends BaseTest {
     }
 
     @Test(description = "Updated user data is reflected in the full user list")
-    public void createThenUpdate_thenGetAll_listContainsUpdatedData() throws Exception {
+    public void createThenUpdate_thenGetAll_listContainsUpdatedData() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();
@@ -79,7 +79,7 @@ public class UserFlowTest extends BaseTest {
     // --- delete flows ---
 
     @Test(description = "Deleted user is no longer retrievable by id")
-    public void createThenDelete_thenGet_returns404() throws Exception {
+    public void createThenDelete_thenGet_returns404() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();
@@ -95,7 +95,7 @@ public class UserFlowTest extends BaseTest {
     }
 
     @Test(description = "Deleted user is no longer present in the full user list")
-    public void createThenDelete_thenGetAll_doesNotContainUser() throws Exception {
+    public void createThenDelete_thenGetAll_doesNotContainUser() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();
@@ -114,7 +114,7 @@ public class UserFlowTest extends BaseTest {
     }
 
     @Test(description = "Deleting an already deleted user returns 404")
-    public void createThenDelete_thenDeleteAgain_returns404() throws Exception {
+    public void createThenDelete_thenDeleteAgain_returns404() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();
@@ -132,7 +132,7 @@ public class UserFlowTest extends BaseTest {
     // --- update isolation ---
 
     @Test(description = "Updating one user does not affect another user's data")
-    public void createTwo_updateOne_thenGetOther_unchanged() throws Exception {
+    public void createTwo_updateOne_thenGetOther_unchanged() {
         UserDto userA = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();
@@ -152,7 +152,7 @@ public class UserFlowTest extends BaseTest {
     }
 
     @Test(description = "Deleting one user does not remove other users from the list")
-    public void createTwo_deleteOne_thenGetAll_otherStillPresent() throws Exception {
+    public void createTwo_deleteOne_thenGetAll_otherStillPresent() {
         UserDto userA = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();
@@ -174,7 +174,7 @@ public class UserFlowTest extends BaseTest {
     // --- full lifecycle ---
 
     @Test(description = "Full user lifecycle: create, read, update, read, list, delete, verify gone from read and list")
-    public void fullCrudLifecycle() throws Exception {
+    public void fullCrudLifecycle() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();

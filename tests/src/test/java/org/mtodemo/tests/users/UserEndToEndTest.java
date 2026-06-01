@@ -16,7 +16,7 @@ import org.testng.annotations.Test;
 public class UserEndToEndTest extends BaseTest {
 
     @Test(description = "Created user is persisted in Postgres and a UserCreated event is published to Kafka")
-    public void createUser_dbThenKafka() throws Exception {
+    public void createUser_dbThenKafka() {
         Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .then(UserTestMapper.toEntity())
@@ -27,7 +27,7 @@ public class UserEndToEndTest extends BaseTest {
     }
 
     @Test(description = "Creating a user publishes a UserCreated Kafka event matching the response body")
-    public void createUser_publishesKafkaEvent() throws Exception {
+    public void createUser_publishesKafkaEvent() {
         Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .then(UserTestMapper.toCreatedEvent())
@@ -36,7 +36,7 @@ public class UserEndToEndTest extends BaseTest {
     }
 
     @Test(description = "Creating a user triggers full system flow: Postgres persistence, Kafka event, and MongoDB projection")
-    public void createUser_fullSystemFlow() throws Exception {
+    public void createUser_fullSystemFlow() {
         Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .then(UserTestMapper.toEntity())
@@ -49,7 +49,7 @@ public class UserEndToEndTest extends BaseTest {
     }
 
     @Test(description = "Updating a user triggers full system flow: Postgres updated, UserUpdatedEvent published to Kafka, MongoDB projection updated")
-    public void updateUser_fullSystemFlow() throws Exception {
+    public void updateUser_fullSystemFlow() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();
@@ -67,7 +67,7 @@ public class UserEndToEndTest extends BaseTest {
     }
 
     @Test(description = "Deleting a user triggers full system flow: removed from Postgres, UserDeletedEvent published to Kafka, MongoDB projection removed")
-    public void deleteUser_fullSystemFlow() throws Exception {
+    public void deleteUser_fullSystemFlow() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();

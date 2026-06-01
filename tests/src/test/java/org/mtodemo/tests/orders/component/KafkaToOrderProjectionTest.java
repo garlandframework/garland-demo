@@ -14,7 +14,7 @@ import java.time.Duration;
 public class KafkaToOrderProjectionTest extends BaseTest {
 
     @Test(description = "An OrderPlaced Kafka event published directly is projected into MongoDB by the projection-service")
-    public void orderPlacedEvent_projectedToMongo() throws Exception {
+    public void orderPlacedEvent_projectedToMongo() {
         OrderPlacedEvent event = TestEvents.defaultOrderPlacedEvent();
 
         Pipeline.given(new KafkaMessage<>(event.orderId().toString(), event))

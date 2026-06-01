@@ -14,7 +14,7 @@ import org.testng.annotations.Test;
 public class OrderApiToKafkaTest extends BaseTest {
 
     @Test(description = "Placing an order via HTTP persists it in Postgres and publishes a matching OrderPlaced event to Kafka")
-    public void placeOrder_persistedInDb_andPublishesKafkaEvent() throws Exception {
+    public void placeOrder_persistedInDb_andPublishesKafkaEvent() {
         UserDto user = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();

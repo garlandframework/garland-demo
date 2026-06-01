@@ -13,7 +13,7 @@ import java.util.UUID;
 public class GetUserByIdApiTest extends BaseTest {
 
     @Test(description = "GET /api/users/{id} with non-existent id returns 404 with error body")
-    public void getUserById_notFound() throws Exception {
+    public void getUserById_notFound() {
         Pipeline.given(TestUserRequests.getUser(UUID.randomUUID()))
                 .then(httpClient.makeCall(404, ErrorDto.class))
                 .then(Verify.matching(ErrorDto.withStatus(404)))
@@ -21,7 +21,7 @@ public class GetUserByIdApiTest extends BaseTest {
     }
 
     @Test(description = "GET /api/users/{id} returns 200 and the user data matching the given id")
-    public void getUserById_returnsCorrectUser() throws Exception {
+    public void getUserById_returnsCorrectUser() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();

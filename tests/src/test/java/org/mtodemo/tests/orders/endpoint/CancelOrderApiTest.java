@@ -18,7 +18,7 @@ import java.util.UUID;
 public class CancelOrderApiTest extends BaseTest {
 
     @Test(description = "PUT /api/orders/{id}/cancel with non-existent id returns 404 with error body")
-    public void cancelOrder_notFound() throws Exception {
+    public void cancelOrder_notFound() {
         Pipeline.given(TestOrderRequests.cancelOrder(UUID.randomUUID()))
                 .then(httpClient.makeCall(404, ErrorDto.class))
                 .then(Verify.matching(ErrorDto.withStatus(404)))
@@ -26,7 +26,7 @@ public class CancelOrderApiTest extends BaseTest {
     }
 
     @Test(description = "PUT /api/orders/{id}/cancel returns 200 with CANCELLED status and change is persisted in Postgres")
-    public void cancelOrder_statusUpdatedInDb() throws Exception {
+    public void cancelOrder_statusUpdatedInDb() {
         UserDto user = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();
