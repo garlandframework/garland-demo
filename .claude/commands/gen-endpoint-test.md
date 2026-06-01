@@ -94,6 +94,31 @@ UserTestMapper.entityToCreatedEvent() // UserEntity → UserCreatedEvent
 UserTestMapper.toProjectionDoc()      // UserDto → UserProjectionDoc (for MongoDB)
 ```
 
+## Temporal tolerance in HTTP responses
+
+For GET endpoints that return objects with server-generated timestamp fields, use `makeCall(HttpCallResponse<R>, Duration)` instead of `makeCall(int, Class<R>)`. This lets you assert the full response body including the timestamp:
+
+```java
+Instant testStart = Instant.now();
+UserDto expectedDto = TestUsers.builder().createdAt(testStart).build();  // set timestamp = testStart
+
+Pipeline.given(TestUserRequests.getUser(user.getUuid()))
+        .then(httpClient.makeCall(
+                new HttpCallResponse<>(200, Map.of(), expectedDto),
+                Duration.ofSeconds(5)))
+        .execute();
+```
+
+For **delayed persistence** (service returns no body, data is written asynchronously) — poll with `pollingCall`:
+
+```java
+Pipeline.given(TestUserRequests.getUser(user.getUuid()))
+        .then(httpClient.pollingCall(200, expectedDto, RetryConfig.of(10, Duration.ofSeconds(2)), Duration.ofSeconds(5)))
+        .execute();
+```
+
+For simple status-only or body-only tests where timestamps are irrelevant, continue using `makeCall(int, Class<R>)` and leave timestamp fields `null` in the expected object.
+
 ## Error response DTOs
 
 Two DTO shapes depending on the error type:

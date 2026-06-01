@@ -70,7 +70,7 @@ public void createUser_fullSystemFlow() throws Exception {
             .then(UserTestMapper.entityToCreatedEvent())
             .then(kafkaClient.consumeMatching(UserCreatedEvent.class))
             .then(UserTestMapper.toProjectionDoc())
-            .then(mongoClient.findById())
+            .then(mongoClient.findById(Duration.ofMillis(1)))
             .execute();
 }
 ```
@@ -94,7 +94,7 @@ public void updateUser_fullSystemFlow() throws Exception {
             .then(UserTestMapper.entityToUpdatedEvent())
             .then(kafkaClient.consumeMatching(UserUpdatedEvent.class))
             .then(UserTestMapper.toUpdatedProjectionDoc())
-            .then(mongoClient.findById())
+            .then(mongoClient.findById(Duration.ofMillis(1)))
             .execute();
 }
 ```
@@ -168,12 +168,35 @@ UserTestMapper.INSTANCE.toCreatedEvent(UserDto)
 ## DB and MongoDB assertion steps
 
 ```java
-dbClient.findById()        // asserts record exists and matches — throws if absent
-dbClient.notExistsById()   // asserts record is absent — throws if present
+dbClient.findById()                           // asserts record exists and matches — throws if absent
+dbClient.findById(Duration temporalTolerance) // same with timestamp tolerance (Postgres precision)
+dbClient.notExistsById()                      // asserts record is absent — throws if present
 
-mongoClient.findById()     // asserts document exists and matches — throws if absent
-mongoClient.notExistsById() // asserts document is absent — throws if present
+mongoClient.findById()                            // asserts document exists and matches — throws if absent
+mongoClient.findById(Duration temporalTolerance)  // same with timestamp tolerance — use for any doc with timestamp fields
+mongoClient.notExistsById()                       // asserts document is absent — throws if present
 ```
+
+Always use `mongoClient.findById(Duration.ofMillis(1))` when the expected document contains a timestamp field — MongoDB truncates nanoseconds to milliseconds and exact comparison will fail.
+
+## Temporal tolerance
+
+Two situations require temporal tolerance:
+
+**MongoDB precision truncation** — MongoDB stores `Instant` with millisecond precision. Any expected document with a timestamp field must use `findById(Duration.ofMillis(1))`.
+
+**Service-generated timestamps** — When the service sets a timestamp internally (e.g. `eventTimestamp = Instant.now()`), capture the test start time and use it as the expected value with a tolerance equal to the maximum acceptable processing delay:
+
+```java
+Instant testStart = Instant.now();
+
+OrderPlacedEvent expected = new OrderPlacedEvent(orderId, ..., testStart);
+Pipeline.given(expected)
+        .then(orderKafkaClient.consumeMatching(OrderPlacedEvent.class, Duration.ofMinutes(2)))
+        .execute();
+```
+
+This asserts the timestamp is present and within the SLA window — if processing takes more than 2 minutes, the test fails.
 
 ## Request factories
 
@@ -197,7 +220,7 @@ TestUsers.requiredFieldsOnlyUser()         // name + surname only
 - **Assert all four systems** — an e2e test that skips Kafka or MongoDB is a component test, not an e2e test
 - **One pipeline per logical operation** — do not chain create→delete in one pipeline
 - **Pre-compute expected state before a destructive operation** — capture entity/doc before calling delete so `notExistsById` has something to check
-- **null fields in expected objects are skipped** by `consumeMatching` — use `null` for fields you cannot predict (e.g. `eventTimestamp` in `UserDeletedEvent`)
+- **Prefer temporal tolerance over `null` for timestamp fields** — `null` skips the field entirely; tolerance still verifies the field is present and within bounds. Use `consumeMatching(Class, Duration)` for events with service-generated timestamps. Use `null` only for truly unpredictable non-temporal fields.
 - **No validation or error tests** — blank/null/size tests belong in endpoint tests
 - **description** reads as a system-level story: "Creating a user triggers full system flow: ...", not "Test create e2e"
 - **Cross-domain FK — always create the dependency first** — `PLACEHOLDER_USER_ID` must not be used in e2e tests. E2e tests persist to the database; services validate FK existence at the service/DB layer. Create the referenced entity in a setup pipeline and use the returned UUID.
@@ -218,6 +241,8 @@ import org.mtodemo.tests.factory.TestUsers;
 import org.mtodemo.tests.infrastructure.BaseTest;
 import org.mtodemo.tests.mapper.UserTestMapper;
 import org.testng.annotations.Test;
+import java.time.Duration;
+import java.time.Instant;
 ```
 
 ---

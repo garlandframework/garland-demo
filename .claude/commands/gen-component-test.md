@@ -64,12 +64,14 @@ public void userCreatedEvent_projectedToMongo() throws Exception {
 
     UserProjectionDoc expectedDoc = UserTestMapper.INSTANCE.toProjectionDoc(event);
     Pipeline.given(expectedDoc)
-            .then(mongoClient.findById())
+            .then(mongoClient.findById(Duration.ofMillis(1)))
             .execute();
 }
 ```
 
 Two pipelines: one to publish the event, one to assert the projection. The split reflects two distinct operations.
+
+**MongoDB precision** — always use `mongoClient.findById(Duration.ofMillis(1))` when the expected document contains a timestamp field. MongoDB truncates `Instant` nanoseconds to milliseconds; exact comparison will fail without tolerance.
 
 **Important — Kafka client selection:** `publish()` always sends to the first topic registered in the client. For order events (e.g. `order.placed`), use `orderKafkaClient.publish()` — not `kafkaClient.publish()`, which would send to `user.created`.
 
@@ -109,6 +111,7 @@ import org.mtodemo.tests.factory.TestUserRequests;
 import org.mtodemo.tests.infrastructure.BaseTest;
 import org.mtodemo.tests.mapper.UserTestMapper;
 import org.testng.annotations.Test;
+import java.time.Duration;
 ```
 
 ---
