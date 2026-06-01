@@ -10,9 +10,12 @@ import org.modulartestorchestrator.mongodb.MongoWrapper;
 import org.modulartestorchestrator.postgres.DbConfig;
 import org.modulartestorchestrator.postgres.DbTestClient;
 import org.modulartestorchestrator.postgres.HibernateWrapper;
+import org.mtodemo.tests.document.OrderProjectionDoc;
 import org.mtodemo.tests.document.UserProjectionDoc;
 import org.mtodemo.tests.entity.AddressEntity;
 import org.mtodemo.tests.entity.CarEntity;
+import org.mtodemo.tests.entity.OrderEntity;
+import org.mtodemo.tests.entity.OrderItemEntity;
 import org.mtodemo.tests.entity.UserEntity;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
@@ -27,6 +30,7 @@ public abstract class BaseTest {
     protected static HttpTestClient httpClient;
     protected static DbTestClient dbClient;
     protected static KafkaTestClient kafkaClient;
+    protected static KafkaTestClient orderKafkaClient;
     protected static MongoTestClient mongoClient;
 
     protected static HibernateWrapper hibernate;
@@ -45,6 +49,8 @@ public abstract class BaseTest {
                         .entity(UserEntity.class)
                         .entity(AddressEntity.class)
                         .entity(CarEntity.class)
+                        .entity(OrderEntity.class)
+                        .entity(OrderItemEntity.class)
                         .build()
         );
         dbClient = new DbTestClient(hibernate, RetryConfig.of(5, Duration.ofSeconds(2)));
@@ -61,11 +67,23 @@ public abstract class BaseTest {
         );
         kafkaClient.warmup();
 
+        orderKafkaClient = new KafkaTestClient(
+                KafkaConfig.builder()
+                        .bootstrapServers(Connections.KAFKA_BOOTSTRAP_SERVERS)
+                        .topic(Connections.KAFKA_TOPIC_ORDER_PLACED)
+                        .topic(Connections.KAFKA_TOPIC_ORDER_CANCELLED)
+                        .groupId(UUID.randomUUID().toString())
+                        .build(),
+                RetryConfig.of(5, Duration.ofSeconds(2))
+        );
+        orderKafkaClient.warmup();
+
         mongo = new MongoWrapper(
                 MongoConfig.builder()
                         .connectionString(Connections.MONGO_CONNECTION_STRING)
                         .database(Connections.MONGO_DATABASE)
                         .collection(UserProjectionDoc.class, "users")
+                        .collection(OrderProjectionDoc.class, "order_projections")
                         .build()
         );
         mongoClient = new MongoTestClient(mongo, RetryConfig.of(10, Duration.ofSeconds(2)));
@@ -75,6 +93,7 @@ public abstract class BaseTest {
     public void tearDownSuite() {
         if (hibernate != null) hibernate.close();
         if (kafkaClient != null) kafkaClient.close();
+        if (orderKafkaClient != null) orderKafkaClient.close();
         if (mongo != null) mongo.close();
     }
 }

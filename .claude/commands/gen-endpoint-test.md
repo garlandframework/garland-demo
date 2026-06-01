@@ -35,8 +35,26 @@ tests/src/test/java/org/mtodemo/tests/
 |---|---|---|
 | `httpClient` | `HttpTestClient` | HTTP calls to user-service and projection-service |
 | `dbClient` | `DbTestClient` | Postgres via Hibernate |
-| `kafkaClient` | `KafkaTestClient` | Kafka consumer/producer |
+| `kafkaClient` | `KafkaTestClient` | User-domain Kafka (`user.created`, …) |
+| `orderKafkaClient` | `KafkaTestClient` | Order-domain Kafka (`order.placed`, …) |
 | `mongoClient` | `MongoTestClient` | MongoDB projections |
+
+## Cross-domain FK in endpoint tests
+
+When a domain references another domain's entity (e.g. `OrderRequest.userId`), the factory provides a `PLACEHOLDER_USER_ID`. Use the placeholder **only for validation (400) tests** — the service rejects invalid field values before hitting the DB.
+
+For **happy-path tests** (201/200 expected) that persist data, the referenced entity must exist. Create it first:
+
+```java
+UserDto user = Pipeline.given(TestUserRequests.createUser())
+        .then(httpClient.makeCall(201, UserDto.class))
+        .execute();
+
+Pipeline.given(TestOrderRequests.placeOrder(
+                TestOrders.builder().userId(user.getUuid()).build()))
+        .then(httpClient.makeCall(201, OrderDto.class))
+        ...
+```
 
 ## Request factories
 

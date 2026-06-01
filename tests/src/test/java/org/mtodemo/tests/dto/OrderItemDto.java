@@ -1,21 +1,22 @@
-package org.mtodemo.projectionservice.document;
+package org.mtodemo.tests.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.mongodb.core.mapping.Field;
-import org.springframework.data.mongodb.core.mapping.FieldType;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderItemDoc {
-    private UUID itemId;
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class OrderItemDto {
+    private UUID uuid;
     private String productName;
     private Integer quantity;
-    @Field(targetType = FieldType.DECIMAL128)
     private BigDecimal unitPrice;
 }

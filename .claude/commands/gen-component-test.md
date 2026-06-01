@@ -59,7 +59,7 @@ public void userCreatedEvent_projectedToMongo() throws Exception {
     UserCreatedEvent event = TestEvents.defaultUserCreatedEvent();
 
     Pipeline.given(new KafkaMessage<>(event.userId().toString(), event))
-            .then(kafkaClient.publish())
+            .then(kafkaClient.publish())   // kafkaClient has user.created as first topic
             .execute();
 
     UserProjectionDoc expectedDoc = UserTestMapper.INSTANCE.toProjectionDoc(event);
@@ -70,6 +70,8 @@ public void userCreatedEvent_projectedToMongo() throws Exception {
 ```
 
 Two pipelines: one to publish the event, one to assert the projection. The split reflects two distinct operations.
+
+**Important — Kafka client selection:** `publish()` always sends to the first topic registered in the client. For order events (e.g. `order.placed`), use `orderKafkaClient.publish()` — not `kafkaClient.publish()`, which would send to `user.created`.
 
 ## Test data factories
 
@@ -91,6 +93,8 @@ Component tests share the Kafka topic with other test levels. Run them sequentia
 - **`TestEvents` is the only entry point for Slice 2** — never derive events from `TestUserRequests` or HTTP responses
 - **Two pipelines in Slice 2** — publish is one pipeline, MongoDB assertion is another
 - **No validation/error tests** — those belong in endpoint tests
+- **Cross-domain FK in Slice 1 happy-path tests** — `PLACEHOLDER_USER_ID` is valid for validation (400) tests. For happy-path Slice 1 tests that persist an order, create a real user first and use `user.getUuid()`. Services validate FK existence at the database layer, not just at annotation validation.
+- **Use the correct Kafka client** — `kafkaClient` for user-domain events, `orderKafkaClient` for order-domain events
 
 ## Imports reference
 

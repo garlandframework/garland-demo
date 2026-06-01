@@ -48,8 +48,11 @@ A full e2e test walks this entire chain in order. Each system is asserted explic
 |---|---|---|
 | `httpClient` | `HttpTestClient` | HTTP calls to user-service |
 | `dbClient` | `DbTestClient` | Postgres via Hibernate |
-| `kafkaClient` | `KafkaTestClient` | Subscribes to `user.created`, `user.updated`, `user.deleted` |
+| `kafkaClient` | `KafkaTestClient` | User-domain Kafka — `user.created`, `user.updated`, `user.deleted` |
+| `orderKafkaClient` | `KafkaTestClient` | Order-domain Kafka — `order.placed`, `order.cancelled` |
 | `mongoClient` | `MongoTestClient` | MongoDB projections |
+
+`publish()` and `consumeMatching()` operate on the first registered topic in a client. Use `kafkaClient` for user events and `orderKafkaClient` for order events.
 
 ## Pipeline structure
 
@@ -197,6 +200,8 @@ TestUsers.requiredFieldsOnlyUser()         // name + surname only
 - **null fields in expected objects are skipped** by `consumeMatching` — use `null` for fields you cannot predict (e.g. `eventTimestamp` in `UserDeletedEvent`)
 - **No validation or error tests** — blank/null/size tests belong in endpoint tests
 - **description** reads as a system-level story: "Creating a user triggers full system flow: ...", not "Test create e2e"
+- **Cross-domain FK — always create the dependency first** — `PLACEHOLDER_USER_ID` must not be used in e2e tests. E2e tests persist to the database; services validate FK existence at the service/DB layer. Create the referenced entity in a setup pipeline and use the returned UUID.
+- **Use the correct Kafka client per domain** — `kafkaClient` for `user.*` events, `orderKafkaClient` for `order.*` events
 
 ## Imports reference
 
