@@ -55,7 +55,6 @@ public interface OrderTestMapper {
 
     @Mapping(source = "orderId", target = "id")
     @Mapping(target = "status", ignore = true)
-    @Mapping(target = "eventTimestamp", ignore = true)
     @Mapping(target = "sourceSystem", ignore = true)
     OrderProjectionDoc toProjectionDoc(OrderPlacedEvent event);
 
