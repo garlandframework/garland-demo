@@ -1,7 +1,7 @@
 package org.mtodemo.tests.orders;
 
 import org.modulartestorchestrator.base.Pipeline;
-import org.mtodemo.tests.document.OrderProjectionDoc;
+import org.modulartestorchestrator.base.checks.Verify;
 import org.mtodemo.tests.dto.OrderDto;
 import org.mtodemo.tests.dto.UserDto;
 import org.mtodemo.tests.event.OrderCancelledEvent;
@@ -25,12 +25,11 @@ public class OrderEndToEndTest extends BaseTest {
 
         Pipeline.given(TestOrderRequests.placeOrder(TestOrders.builder().userId(user.getUuid()).build()))
                 .then(httpClient.makeCall(201, OrderDto.class))
-                .then(OrderTestMapper.toEntity())
-                .then(dbClient.findById())
-                .then(OrderTestMapper.entityToPlacedEvent())
-                .then(orderKafkaClient.consumeMatching(OrderPlacedEvent.class))
-                .then(OrderTestMapper.toProjectionDoc())
-                .then(mongoClient.findById(Duration.ofMillis(1)))
+                .then(Verify.allOf(
+                        OrderTestMapper.toEntity().andThen(dbClient.findById()),
+                        OrderTestMapper.toPlacedEvent().andThen(orderKafkaClient.consumeMatching(OrderPlacedEvent.class)),
+                        OrderTestMapper.toPlacedEvent().andThen(OrderTestMapper.toProjectionDoc()).andThen(mongoClient.findById(Duration.ofMillis(1)))
+                ))
                 .execute();
     }
 
@@ -50,21 +49,11 @@ public class OrderEndToEndTest extends BaseTest {
                 .execute();
 
         Pipeline.given(cancelled)
-                .then(OrderTestMapper.toEntity())
-                .then(dbClient.findById())
-                .execute();
-
-        Pipeline.given(cancelled)
-                .then(OrderTestMapper.toCancelledEvent())
-                .then(orderKafkaClient.consumeMatching(OrderCancelledEvent.class))
-                .execute();
-
-        OrderProjectionDoc expectedCancelledDoc = OrderProjectionDoc.builder()
-                .id(created.getUuid())
-                .status("CANCELLED")
-                .build();
-        Pipeline.given(expectedCancelledDoc)
-                .then(mongoClient.findById())
+                .then(Verify.allOf(
+                        OrderTestMapper.toEntity().andThen(dbClient.findById()),
+                        OrderTestMapper.toCancelledEvent().andThen(orderKafkaClient.consumeMatching(OrderCancelledEvent.class)),
+                        OrderTestMapper.toCancelledProjectionDoc().andThen(mongoClient.findById())
+                ))
                 .execute();
     }
 }

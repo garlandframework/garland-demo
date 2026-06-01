@@ -81,4 +81,11 @@ public interface OrderTestMapper {
     static StepFunction<OrderDto, OrderCancelledEvent> toCancelledEvent() {
         return StepFunction.lift(INSTANCE::toCancelledEvent);
     }
+
+    static StepFunction<OrderDto, OrderProjectionDoc> toCancelledProjectionDoc() {
+        return StepFunction.lift(dto -> OrderProjectionDoc.builder()
+                .id(dto.getUuid())
+                .status("CANCELLED")
+                .build());
+    }
 }

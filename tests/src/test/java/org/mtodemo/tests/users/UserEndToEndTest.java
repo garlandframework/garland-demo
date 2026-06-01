@@ -1,9 +1,8 @@
 package org.mtodemo.tests.users;
 
 import org.modulartestorchestrator.base.Pipeline;
-import org.mtodemo.tests.document.UserProjectionDoc;
+import org.modulartestorchestrator.base.checks.Verify;
 import org.mtodemo.tests.dto.UserDto;
-import org.mtodemo.tests.entity.UserEntity;
 import org.mtodemo.tests.event.UserCreatedEvent;
 import org.mtodemo.tests.event.UserDeletedEvent;
 import org.mtodemo.tests.event.UserUpdatedEvent;
@@ -19,10 +18,10 @@ public class UserEndToEndTest extends BaseTest {
     public void createUser_dbThenKafka() {
         Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
-                .then(UserTestMapper.toEntity())
-                .then(dbClient.findById())
-                .then(UserTestMapper.entityToCreatedEvent())
-                .then(kafkaClient.consumeMatching(UserCreatedEvent.class))
+                .then(Verify.allOf(
+                        UserTestMapper.toEntity().andThen(dbClient.findById()),
+                        UserTestMapper.toCreatedEvent().andThen(kafkaClient.consumeMatching(UserCreatedEvent.class))
+                ))
                 .execute();
     }
 
@@ -39,12 +38,11 @@ public class UserEndToEndTest extends BaseTest {
     public void createUser_fullSystemFlow() {
         Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
-                .then(UserTestMapper.toEntity())
-                .then(dbClient.findById())
-                .then(UserTestMapper.entityToCreatedEvent())
-                .then(kafkaClient.consumeMatching(UserCreatedEvent.class))
-                .then(UserTestMapper.toProjectionDoc())
-                .then(mongoClient.findById())
+                .then(Verify.allOf(
+                        UserTestMapper.toEntity().andThen(dbClient.findById()),
+                        UserTestMapper.toCreatedEvent().andThen(kafkaClient.consumeMatching(UserCreatedEvent.class)),
+                        UserTestMapper.dtoToCreatedProjectionDoc().andThen(mongoClient.findById())
+                ))
                 .execute();
     }
 
@@ -57,12 +55,11 @@ public class UserEndToEndTest extends BaseTest {
         UserDto updatePayload = TestUsers.defaultUser();
         Pipeline.given(TestUserRequests.updateUser(created.getUuid(), updatePayload))
                 .then(httpClient.makeCall(200, UserDto.class))
-                .then(UserTestMapper.toEntity())
-                .then(dbClient.findById())
-                .then(UserTestMapper.entityToUpdatedEvent())
-                .then(kafkaClient.consumeMatching(UserUpdatedEvent.class))
-                .then(UserTestMapper.toUpdatedProjectionDoc())
-                .then(mongoClient.findById())
+                .then(Verify.allOf(
+                        UserTestMapper.toEntity().andThen(dbClient.findById()),
+                        UserTestMapper.toUpdatedEvent().andThen(kafkaClient.consumeMatching(UserUpdatedEvent.class)),
+                        UserTestMapper.dtoToUpdatedProjectionDoc().andThen(mongoClient.findById())
+                ))
                 .execute();
     }
 
@@ -72,24 +69,16 @@ public class UserEndToEndTest extends BaseTest {
                 .then(httpClient.makeCall(201, UserDto.class))
                 .execute();
 
-        UserEntity expectedEntity = UserTestMapper.INSTANCE.toEntity(created);
-        UserProjectionDoc expectedDoc = UserTestMapper.INSTANCE.toProjectionDoc(
-                UserTestMapper.INSTANCE.toCreatedEvent(created));
-
         Pipeline.given(TestUserRequests.deleteUser(created.getUuid()))
                 .then(httpClient.makeCall(204, Void.class))
                 .execute();
 
-        Pipeline.given(expectedEntity)
-                .then(dbClient.notExistsById())
-                .execute();
-
-        Pipeline.given(new UserDeletedEvent(created.getUuid(), null))
-                .then(kafkaClient.consumeMatching(UserDeletedEvent.class))
-                .execute();
-
-        Pipeline.given(expectedDoc)
-                .then(mongoClient.notExistsById())
+        Pipeline.given(created)
+                .then(Verify.allOf(
+                        UserTestMapper.toEntity().andThen(dbClient.notExistsById()),
+                        UserTestMapper.toDeletedEvent().andThen(kafkaClient.consumeMatching(UserDeletedEvent.class)),
+                        UserTestMapper.dtoToCreatedProjectionDoc().andThen(mongoClient.notExistsById())
+                ))
                 .execute();
     }
 }

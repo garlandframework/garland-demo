@@ -1,6 +1,7 @@
 package org.mtodemo.tests.orders.component;
 
 import org.modulartestorchestrator.base.Pipeline;
+import org.modulartestorchestrator.base.checks.Verify;
 import org.mtodemo.tests.dto.OrderDto;
 import org.mtodemo.tests.dto.UserDto;
 import org.mtodemo.tests.event.OrderPlacedEvent;
@@ -21,10 +22,10 @@ public class OrderApiToKafkaTest extends BaseTest {
 
         Pipeline.given(TestOrderRequests.placeOrder(TestOrders.builder().userId(user.getUuid()).build()))
                 .then(httpClient.makeCall(201, OrderDto.class))
-                .then(OrderTestMapper.toEntity())
-                .then(dbClient.findById())
-                .then(OrderTestMapper.entityToPlacedEvent())
-                .then(orderKafkaClient.consumeMatching(OrderPlacedEvent.class))
+                .then(Verify.allOf(
+                        OrderTestMapper.toEntity().andThen(dbClient.findById()),
+                        OrderTestMapper.toPlacedEvent().andThen(orderKafkaClient.consumeMatching(OrderPlacedEvent.class))
+                ))
                 .execute();
     }
 }

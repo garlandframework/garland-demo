@@ -147,4 +147,16 @@ public interface UserTestMapper {
     static StepFunction<UserUpdatedEvent, UserProjectionDoc> toUpdatedProjectionDoc() {
         return StepFunction.lift(event -> INSTANCE.toProjectionDoc(event));
     }
+
+    static StepFunction<UserDto, UserDeletedEvent> toDeletedEvent() {
+        return StepFunction.lift(INSTANCE::toDeletedEvent);
+    }
+
+    static StepFunction<UserDto, UserProjectionDoc> dtoToCreatedProjectionDoc() {
+        return StepFunction.lift(dto -> INSTANCE.toProjectionDoc(INSTANCE.toCreatedEvent(dto)));
+    }
+
+    static StepFunction<UserDto, UserProjectionDoc> dtoToUpdatedProjectionDoc() {
+        return StepFunction.lift(dto -> INSTANCE.toProjectionDoc(INSTANCE.toUpdatedEvent(dto)));
+    }
 }
