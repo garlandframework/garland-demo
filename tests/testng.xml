@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<!--
+  Tests run sequentially (parallel="false") — Kafka topics are shared across
+  classes and parallel execution causes event contamination.
+
+  Order of sections matches confidence layers: fast endpoint checks first,
+  full cross-system chains last.
+
+  Generated order tests drop into the same packages automatically.
+  E2E test classes must be added explicitly to the E2E section below.
+-->
+<suite name="MTO Demo" verbose="1" parallel="false">
+
+    <test name="Endpoint Tests">
+        <packages>
+            <package name="org.mtodemo.tests.users.endpoint"/>
+            <package name="org.mtodemo.tests.orders.endpoint"/>
+        </packages>
+    </test>
+
+    <test name="Flow Tests">
+        <packages>
+            <package name="org.mtodemo.tests.users.flow"/>
+            <package name="org.mtodemo.tests.orders.flow"/>
+        </packages>
+    </test>
+
+    <test name="Component Tests">
+        <packages>
+            <package name="org.mtodemo.tests.users.component"/>
+            <package name="org.mtodemo.tests.orders.component"/>
+        </packages>
+    </test>
+
+    <test name="E2E Tests">
+        <classes>
+            <class name="org.mtodemo.tests.users.UserEndToEndTest"/>
+            <!-- add org.mtodemo.tests.orders.OrderEndToEndTest when generated -->
+        </classes>
+    </test>
+
+</suite>

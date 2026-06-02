@@ -22,6 +22,7 @@ import org.mtodemo.tests.entity.OrderItemEntity;
 import org.mtodemo.tests.entity.UserEntity;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Listeners;
 
 import java.time.Duration;
@@ -94,6 +95,12 @@ public abstract class BaseTest {
                         .build()
         );
         mongoClient = new MongoTestClient(mongo, RetryConfig.of(10, Duration.ofSeconds(2)));
+    }
+
+    @BeforeTest
+    public void seekKafkaToLatest() {
+        if (kafkaClient != null) kafkaClient.warmup();
+        if (orderKafkaClient != null) orderKafkaClient.warmup();
     }
 
     @AfterSuite
