@@ -1,7 +1,10 @@
 package org.mtodemo.tests.infrastructure;
 
+import org.modulartestorchestrator.base.Pipeline;
 import org.modulartestorchestrator.base.retry.RetryConfig;
 import org.modulartestorchestrator.http.HttpTestClient;
+import org.mtodemo.tests.dto.TokenDto;
+import org.mtodemo.tests.factory.TestAuthRequests;
 import org.modulartestorchestrator.kafka.KafkaConfig;
 import org.modulartestorchestrator.kafka.KafkaTestClient;
 import org.modulartestorchestrator.mongodb.MongoConfig;
@@ -39,7 +42,11 @@ public abstract class BaseTest {
     @BeforeSuite
     public void setUpSuite() {
         if (httpClient != null) return;
-        httpClient = new HttpTestClient(RetryConfig.of(3, Duration.ofSeconds(2))).withBearer(Connections.API_TOKEN);
+        httpClient = new HttpTestClient(RetryConfig.of(3, Duration.ofSeconds(2)));
+        TokenDto tokenDto = Pipeline.given(TestAuthRequests.login())
+                .then(httpClient.makeCall(200, TokenDto.class))
+                .execute();
+        httpClient = httpClient.withBearer(tokenDto.token());
 
         hibernate = new HibernateWrapper(
                 DbConfig.builder()

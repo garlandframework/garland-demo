@@ -3,7 +3,11 @@ server:
 
 app:
   security:
-    token: ${APP_SECURITY_TOKEN:demo-secret-token}
+    jwt:
+      secret: ${APP_JWT_SECRET:ZGVtby1tdG8tand0LXNlY3JldC1rZXktbm90LWZvci1wcm9kdWN0aW9u}
+    credentials:
+      username: ${APP_CREDENTIALS_USERNAME:admin}
+      password: ${APP_CREDENTIALS_PASSWORD:admin}
 
 spring:
   application:

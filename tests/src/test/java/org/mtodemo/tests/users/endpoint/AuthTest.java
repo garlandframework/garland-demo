@@ -3,6 +3,7 @@ package org.mtodemo.tests.users.endpoint;
 import org.modulartestorchestrator.base.Pipeline;
 import org.modulartestorchestrator.http.model.HttpCallResponse;
 import org.mtodemo.tests.dto.ErrorDto;
+import org.mtodemo.tests.factory.TestAuthRequests;
 import org.mtodemo.tests.factory.TestUserRequests;
 import org.mtodemo.tests.infrastructure.BaseTest;
 import org.testng.annotations.Test;
@@ -19,11 +20,18 @@ public class AuthTest extends BaseTest {
                 .execute();
     }
 
-    @Test(description = "Request with wrong token returns 401")
-    public void createUser_wrongToken_returns401() {
+    @Test(description = "Request with invalid JWT returns 401")
+    public void createUser_invalidToken_returns401() {
         Pipeline.given(TestUserRequests.createUser())
-                .then(httpClient.withBearer("wrong-token")
+                .then(httpClient.withBearer("not-a-valid-jwt")
                         .makeCall(new HttpCallResponse<>(401, Map.of(), ErrorDto.withStatus(401))))
+                .execute();
+    }
+
+    @Test(description = "Login with wrong credentials returns 401")
+    public void login_wrongCredentials_returns401() {
+        Pipeline.given(TestAuthRequests.login("admin", "wrong-password"))
+                .then(httpClient.makeCall(new HttpCallResponse<>(401, Map.of(), ErrorDto.withStatus(401))))
                 .execute();
     }
 }

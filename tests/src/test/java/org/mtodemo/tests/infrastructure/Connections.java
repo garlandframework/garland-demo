@@ -5,7 +5,8 @@ public final class Connections {
     public static final String USER_SERVICE_URL       = "http://localhost:8080";
     public static final String PROJECTION_SERVICE_URL = "http://localhost:8081";
 
-    public static final String API_TOKEN = "demo-secret-token";
+    public static final String ADMIN_USERNAME = "admin";
+    public static final String ADMIN_PASSWORD = "admin";
 
     public static final String PG_URL      = "jdbc:postgresql://localhost:5432/userdb?TimeZone=UTC";
     public static final String PG_USERNAME = "user";
