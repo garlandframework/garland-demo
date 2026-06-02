@@ -56,6 +56,31 @@ Pipeline.given(TestOrderRequests.placeOrder(
         ...
 ```
 
+## Auth tests
+
+Negative auth tests live in `AuthTest` (same package). Use `httpClient.withoutHeader` / `withBearer` inline — never reassign the shared `httpClient`:
+
+```java
+// No token → 401
+Pipeline.given(TestUserRequests.createUser())
+        .then(httpClient.withoutHeader("Authorization")
+                .makeCall(new HttpCallResponse<>(401, Map.of(), ErrorDto.withStatus(401))))
+        .execute();
+
+// Invalid JWT → 401
+Pipeline.given(TestUserRequests.createUser())
+        .then(httpClient.withBearer("not-a-valid-jwt")
+                .makeCall(new HttpCallResponse<>(401, Map.of(), ErrorDto.withStatus(401))))
+        .execute();
+
+// Wrong credentials on login → 401
+Pipeline.given(TestAuthRequests.login("admin", "wrong-password"))
+        .then(httpClient.makeCall(new HttpCallResponse<>(401, Map.of(), ErrorDto.withStatus(401))))
+        .execute();
+```
+
+Auth token is acquired once in `@BeforeSuite` and wired into `httpClient` automatically — no per-test setup needed for happy-path tests.
+
 ## Request factories
 
 Always use `TestUserRequests` — never construct `HttpCallRequest` inline in tests:
@@ -67,6 +92,9 @@ TestUserRequests.updateUser(UUID id, UserDto dto) // PUT /api/users/{id}
 TestUserRequests.getUser(UUID id)           // GET /api/users/{id}
 TestUserRequests.getAllUsers()              // GET /api/users
 TestUserRequests.deleteUser(UUID id)        // DELETE /api/users/{id}
+
+TestAuthRequests.login()                        // POST /api/auth/login, admin credentials
+TestAuthRequests.login(String user, String pwd) // POST /api/auth/login, custom credentials
 ```
 
 ## Test data factories
@@ -178,12 +206,16 @@ Verify.matching(new ErrorDto(404, "User not found"))
 import org.modulartestorchestrator.base.Pipeline;
 import org.modulartestorchestrator.base.checks.Verify;
 import org.modulartestorchestrator.http.model.HttpCallRequest;
+import org.modulartestorchestrator.http.model.HttpCallResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.mtodemo.tests.dto.ErrorDto;
 import org.mtodemo.tests.dto.FieldViolationDto;
 import org.mtodemo.tests.dto.UserDto;
 import org.mtodemo.tests.dto.ValidationErrorDto;
+import org.mtodemo.tests.dto.LoginRequest;
+import org.mtodemo.tests.dto.TokenDto;
 import org.mtodemo.tests.factory.TestAddresses;
+import org.mtodemo.tests.factory.TestAuthRequests;
 import org.mtodemo.tests.factory.TestCars;
 import org.mtodemo.tests.factory.TestUserRequests;
 import org.mtodemo.tests.factory.TestUsers;
@@ -191,6 +223,7 @@ import org.mtodemo.tests.infrastructure.BaseTest;
 import org.mtodemo.tests.mapper.UserTestMapper;
 import org.testng.annotations.Test;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 ```
 
