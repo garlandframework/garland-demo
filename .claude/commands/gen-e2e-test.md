@@ -151,7 +151,7 @@ UserTestMapper.toProjectionDoc()
 UserTestMapper.toUpdatedProjectionDoc()
 ```
 
-Always use the static bridges on the mapper interface (not `StepFunction.lift(INSTANCE::toEntity)`) — the mapper has overloaded methods and type inference will fail for overloaded references.
+Always use the static bridges on the mapper interface (not `Step.lift(INSTANCE::toEntity)`) — the mapper has overloaded methods and type inference will fail for overloaded references.
 
 ## DB and MongoDB assertion steps
 

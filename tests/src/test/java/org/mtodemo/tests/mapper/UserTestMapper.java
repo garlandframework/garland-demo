@@ -3,7 +3,7 @@ package org.mtodemo.tests.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
-import org.modulartestorchestrator.base.StepFunction;
+import org.modulartestorchestrator.base.Step;
 import org.mtodemo.tests.document.AddressInfoDoc;
 import org.mtodemo.tests.document.UserProjectionDoc;
 import org.mtodemo.tests.document.VehicleInfoDoc;
@@ -120,43 +120,43 @@ public interface UserTestMapper {
 
     // --- Pipeline bridges ---
 
-    static StepFunction<UserDto, UserEntity> toEntity() {
-        return StepFunction.lift(INSTANCE::toEntity);
+    static Step<UserDto, UserEntity> toEntity() {
+        return Step.lift(INSTANCE::toEntity);
     }
 
-    static StepFunction<UserDto, UserCreatedEvent> toCreatedEvent() {
-        return StepFunction.lift(INSTANCE::toCreatedEvent);
+    static Step<UserDto, UserCreatedEvent> toCreatedEvent() {
+        return Step.lift(INSTANCE::toCreatedEvent);
     }
 
-    static StepFunction<UserEntity, UserCreatedEvent> entityToCreatedEvent() {
-        return StepFunction.lift(INSTANCE::entityToCreatedEvent);
+    static Step<UserEntity, UserCreatedEvent> entityToCreatedEvent() {
+        return Step.lift(INSTANCE::entityToCreatedEvent);
     }
 
-    static StepFunction<UserCreatedEvent, UserProjectionDoc> toProjectionDoc() {
-        return StepFunction.lift(INSTANCE::toProjectionDoc);
+    static Step<UserCreatedEvent, UserProjectionDoc> toProjectionDoc() {
+        return Step.lift(INSTANCE::toProjectionDoc);
     }
 
-    static StepFunction<UserDto, UserUpdatedEvent> toUpdatedEvent() {
-        return StepFunction.lift(INSTANCE::toUpdatedEvent);
+    static Step<UserDto, UserUpdatedEvent> toUpdatedEvent() {
+        return Step.lift(INSTANCE::toUpdatedEvent);
     }
 
-    static StepFunction<UserEntity, UserUpdatedEvent> entityToUpdatedEvent() {
-        return StepFunction.lift(INSTANCE::entityToUpdatedEvent);
+    static Step<UserEntity, UserUpdatedEvent> entityToUpdatedEvent() {
+        return Step.lift(INSTANCE::entityToUpdatedEvent);
     }
 
-    static StepFunction<UserUpdatedEvent, UserProjectionDoc> toUpdatedProjectionDoc() {
-        return StepFunction.lift(event -> INSTANCE.toProjectionDoc(event));
+    static Step<UserUpdatedEvent, UserProjectionDoc> toUpdatedProjectionDoc() {
+        return Step.lift(event -> INSTANCE.toProjectionDoc(event));
     }
 
-    static StepFunction<UserDto, UserDeletedEvent> toDeletedEvent() {
-        return StepFunction.lift(INSTANCE::toDeletedEvent);
+    static Step<UserDto, UserDeletedEvent> toDeletedEvent() {
+        return Step.lift(INSTANCE::toDeletedEvent);
     }
 
-    static StepFunction<UserDto, UserProjectionDoc> dtoToCreatedProjectionDoc() {
-        return StepFunction.lift(dto -> INSTANCE.toProjectionDoc(INSTANCE.toCreatedEvent(dto)));
+    static Step<UserDto, UserProjectionDoc> dtoToCreatedProjectionDoc() {
+        return Step.lift(dto -> INSTANCE.toProjectionDoc(INSTANCE.toCreatedEvent(dto)));
     }
 
-    static StepFunction<UserDto, UserProjectionDoc> dtoToUpdatedProjectionDoc() {
-        return StepFunction.lift(dto -> INSTANCE.toProjectionDoc(INSTANCE.toUpdatedEvent(dto)));
+    static Step<UserDto, UserProjectionDoc> dtoToUpdatedProjectionDoc() {
+        return Step.lift(dto -> INSTANCE.toProjectionDoc(INSTANCE.toUpdatedEvent(dto)));
     }
 }

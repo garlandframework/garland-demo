@@ -10,7 +10,7 @@ Two Spring Boot microservices connected through Kafka, with a complete integrati
 
 ```
                         ┌─────────────────────────────┐
-                        │        user-service :8080    │
+                        │        user-service :8080   │
                         │                             │
   HTTP client  ──────►  │  /api/users    PostgreSQL   │
                         │  /api/orders   (userdb)     │
@@ -21,12 +21,12 @@ Two Spring Boot microservices connected through Kafka, with a complete integrati
                                user.created / user.updated / user.deleted
                                order.placed / order.cancelled
                                        │
-                        ┌──────────────▼──────────────┐
-                        │    projection-service :8081  │
-                        │                             │
-                        │  /api/projections   MongoDB  │
-                        │                  (projectiondb)
-                        └─────────────────────────────┘
+                        ┌──────────────▼─────────────────┐
+                        │    projection-service :8081    │
+                        │                                │
+                        │  /api/projections   MongoDB    │
+                        │                  (projectiondb)│
+                        └────────────────────────────────┘
 ```
 
 `user-service` owns users and orders — persists to PostgreSQL, publishes events to Kafka. `projection-service` consumes those events and builds read-model documents in MongoDB.

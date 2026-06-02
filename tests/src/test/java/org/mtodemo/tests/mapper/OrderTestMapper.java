@@ -3,7 +3,7 @@ package org.mtodemo.tests.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
-import org.modulartestorchestrator.base.StepFunction;
+import org.modulartestorchestrator.base.Step;
 import org.mtodemo.tests.document.OrderItemDoc;
 import org.mtodemo.tests.document.OrderProjectionDoc;
 import org.mtodemo.tests.dto.OrderDto;
@@ -62,28 +62,28 @@ public interface OrderTestMapper {
 
     // --- Pipeline bridges ---
 
-    static StepFunction<OrderDto, OrderEntity> toEntity() {
-        return StepFunction.lift(INSTANCE::toEntity);
+    static Step<OrderDto, OrderEntity> toEntity() {
+        return Step.lift(INSTANCE::toEntity);
     }
 
-    static StepFunction<OrderDto, OrderPlacedEvent> toPlacedEvent() {
-        return StepFunction.lift(INSTANCE::toPlacedEvent);
+    static Step<OrderDto, OrderPlacedEvent> toPlacedEvent() {
+        return Step.lift(INSTANCE::toPlacedEvent);
     }
 
-    static StepFunction<OrderEntity, OrderPlacedEvent> entityToPlacedEvent() {
-        return StepFunction.lift(INSTANCE::entityToPlacedEvent);
+    static Step<OrderEntity, OrderPlacedEvent> entityToPlacedEvent() {
+        return Step.lift(INSTANCE::entityToPlacedEvent);
     }
 
-    static StepFunction<OrderPlacedEvent, OrderProjectionDoc> toProjectionDoc() {
-        return StepFunction.lift(INSTANCE::toProjectionDoc);
+    static Step<OrderPlacedEvent, OrderProjectionDoc> toProjectionDoc() {
+        return Step.lift(INSTANCE::toProjectionDoc);
     }
 
-    static StepFunction<OrderDto, OrderCancelledEvent> toCancelledEvent() {
-        return StepFunction.lift(INSTANCE::toCancelledEvent);
+    static Step<OrderDto, OrderCancelledEvent> toCancelledEvent() {
+        return Step.lift(INSTANCE::toCancelledEvent);
     }
 
-    static StepFunction<OrderDto, OrderProjectionDoc> toCancelledProjectionDoc() {
-        return StepFunction.lift(dto -> OrderProjectionDoc.builder()
+    static Step<OrderDto, OrderProjectionDoc> toCancelledProjectionDoc() {
+        return Step.lift(dto -> OrderProjectionDoc.builder()
                 .id(dto.getUuid())
                 .status("CANCELLED")
                 .build());
