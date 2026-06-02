@@ -1,6 +1,10 @@
 server:
   port: 8080
 
+app:
+  security:
+    token: ${APP_SECURITY_TOKEN:demo-secret-token}
+
 spring:
   application:
     name: user-service

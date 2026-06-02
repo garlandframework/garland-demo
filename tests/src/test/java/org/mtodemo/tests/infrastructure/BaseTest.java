@@ -39,7 +39,7 @@ public abstract class BaseTest {
     @BeforeSuite
     public void setUpSuite() {
         if (httpClient != null) return;
-        httpClient = new HttpTestClient(RetryConfig.of(3, Duration.ofSeconds(2)));
+        httpClient = new HttpTestClient(RetryConfig.of(3, Duration.ofSeconds(2))).withBearer(Connections.API_TOKEN);
 
         hibernate = new HibernateWrapper(
                 DbConfig.builder()

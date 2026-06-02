@@ -1,6 +1,10 @@
 server:
   port: 8081
 
+app:
+  security:
+    token: ${APP_SECURITY_TOKEN:demo-secret-token}
+
 spring:
   application:
     name: projection-service
