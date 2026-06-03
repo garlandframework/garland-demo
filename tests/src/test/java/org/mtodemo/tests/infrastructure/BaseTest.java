@@ -116,6 +116,7 @@ public abstract class BaseTest {
         dbClient = new PostgresTestClient(postgres, RetryConfig.of(5, Duration.ofSeconds(2)))
                 .withTemporalTolerance(Duration.ofNanos(1000));
 
+        log.info("=== Stage 2: warming up Kafka test consumers ===");
         kafkaClient = new KafkaTestClient(
                 KafkaConfig.builder()
                         .bootstrapServers(Connections.KAFKA_BOOTSTRAP_SERVERS)
@@ -127,6 +128,7 @@ public abstract class BaseTest {
                 RetryConfig.of(5, Duration.ofSeconds(2))
         ).withTemporalTolerance(Duration.ofMillis(1));
         kafkaClient.warmup();
+        log.info("  kafkaClient (user topics) assigned");
 
         orderKafkaClient = new KafkaTestClient(
                 KafkaConfig.builder()
@@ -138,6 +140,8 @@ public abstract class BaseTest {
                 RetryConfig.of(5, Duration.ofSeconds(2))
         ).withTemporalTolerance(Duration.ofMillis(1));
         orderKafkaClient.warmup();
+        log.info("  orderKafkaClient (order topics) assigned");
+        log.info("=== Stage 2 passed: Kafka consumers have partition assignment ===");
 
         mongo = new MongoWrapper(
                 MongoConfig.builder()
