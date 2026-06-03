@@ -258,6 +258,39 @@ UserDto user = TestUsers.builder()
         .build();
 ```
 
+## @BeforeMethod for update/delete test classes
+
+When every test in a class requires a pre-existing entity (e.g. a PUT or DELETE endpoint test), declare the entity as an instance field and create it once per test in `@BeforeMethod`. Do not repeat the setup pipeline inside each test method.
+
+```java
+public class UpdateUserApiTest extends BaseTest {
+
+    private UserDto created;
+
+    @BeforeMethod
+    public void createUser() {
+        created = Pipeline.given(TestUserRequests.createUser())
+                .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
+                .execute();
+    }
+
+    @Test(description = "...")
+    public void updateUser_blankName_returns400() {
+        Pipeline.given(TestUserRequests.updateUser(created.getUuid(), TestUsers.builder().name("").build()))
+                .then(httpClient.makeCall(400, ValidationErrorDto.class))
+                .then(Verify.matching(ValidationErrorDto.forField("name")))
+                .execute();
+    }
+}
+```
+
+`trackUser()` is called in `@BeforeMethod` — `@AfterMethod(alwaysRun = true)` in `BaseTest` cleans up the registered resource after every test, including on failure.
+
+Use this pattern whenever a class has more than two tests that share an identical setup pipeline. If only one or two tests need setup, keep it inline.
+
+Import needed: `import org.testng.annotations.BeforeMethod;`
+
 ## Cleanup
 
 Every test that creates a user must register it for cleanup by adding `.then(trackUser())` immediately after `makeCall(201, UserDto.class)`. Every test that creates an order must add `.then(trackOrder())` after `makeCall(201, OrderDto.class)`.
