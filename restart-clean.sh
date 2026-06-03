@@ -6,10 +6,6 @@ if [[ "$1" == "--soft" ]]; then
   SOFT=true
 fi
 
-echo "Building services..."
-(cd user-service && mvn package -q -DskipTests)
-(cd projection-service && mvn package -q -DskipTests)
-
 if [ "$SOFT" = true ]; then
   echo "Restarting environment (keeping data)..."
   docker-compose down
