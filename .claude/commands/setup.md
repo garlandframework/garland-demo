@@ -216,30 +216,30 @@ Infer the base package from existing test classes, or ask if none exist.
 
 Generate the following files:
 
-**Mirrored classes:**
-- `dto/XxxDto.java` — response DTO mirror
-- `entity/XxxEntity.java` — entity mirror (+ sub-entities)
-- `event/XxxCreatedEvent.java`, `XxxUpdatedEvent.java`, `XxxDeletedEvent.java` — one per event
-- `document/XxxProjectionDoc.java` — document mirror
+**Mirrored classes** (under `support/<domain>/`):
+- `support/<domain>/dto/XxxDto.java` — response DTO mirror
+- `support/<domain>/entity/XxxEntity.java` — entity mirror (+ sub-entities)
+- `support/<domain>/event/XxxCreatedEvent.java`, `XxxUpdatedEvent.java`, `XxxDeletedEvent.java` — one per event
+- `support/<domain>/document/XxxProjectionDoc.java` — document mirror
 
-**Factory classes:**
-- `factory/TestXxx.java` — builds test DTOs; datafaker for random valid values; static `defaultXxx()`;
+**Factory classes** (under `support/<domain>/factory/`):
+- `support/<domain>/factory/TestXxx.java` — builds test DTOs; datafaker for random valid values; static `defaultXxx()`;
   `builder()` with per-field overrides; `requiredFieldsOnlyXxx()` if optional fields exist
-- `factory/TestEvents.java` — one static `defaultXxxCreatedEvent()` per event class; datafaker values
+- `support/<domain>/factory/TestXxxEvents.java` — one static `defaultXxxCreatedEvent()` per event class; datafaker values
 - Sub-factories for nested types (`TestAddresses`, `TestCars` etc.) if sub-DTOs exist
 
-**Mapper:**
-- `mapper/XxxTestMapper.java` — MapStruct `@Mapper(componentModel = "spring")`:
+**Mapper** (under `support/<domain>/mapper/`):
+- `support/<domain>/mapper/XxxTestMapper.java` — MapStruct `@Mapper(componentModel = "spring")`:
   - DTO → Entity
   - Entity → CreatedEvent
   - CreatedEvent → ProjectionDoc
   - Pipeline-compatible static bridge methods returning `Step`
 
-**Infrastructure** (only if not already present — do not overwrite existing BaseTest or Connections):
-- `infrastructure/BaseTest.java` — declares clients for declared protocols; `@BeforeSuite` wires
+**Infrastructure** (only if not already present — do not overwrite existing):
+- `support/base/BaseTest.java` — declares clients for declared protocols; `@BeforeSuite` wires
   them from Connections; `@AfterSuite` closes them; `kafkaClient.warmup()` if Kafka declared.
   **When adding Kafka for a second (or Nth) domain to an existing BaseTest**: do not add the new domain's topics to the existing `kafkaClient`. Instead, declare a separate `<domain>KafkaClient` field with that domain's topics listed first — `publish()` always sends to the first registered topic, so mixing topics from multiple domains in one client will route publishes to the wrong topic.
-- `infrastructure/Connections.java` — one constant per URL/topic/credential; multi-environment
+- `support/base/Connections.java` — one constant per URL/topic/credential; multi-environment
   switch on `System.getProperty("env", "local")`:
 
 ```java
@@ -253,8 +253,8 @@ public static final String USER_SERVICE_URL = switch (ENV) {
 Output:
 ```
 Generating...
-  ✓ dto/XxxDto.java
-  ✓ entity/XxxEntity.java
+  ✓ support/<domain>/dto/XxxDto.java
+  ✓ support/<domain>/entity/XxxEntity.java
   ...
 
 Done.

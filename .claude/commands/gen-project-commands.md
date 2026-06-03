@@ -275,7 +275,7 @@ The rules below are specific to this project.
 <!-- from analysis:
      - real test class name (e.g. KafkaToOrderProjectionTest)
      - real event class name
-     - real TestEvents factory method
+     - real TestXxxEvents factory method (domain-specific, e.g. TestUserEvents, TestOrderEvents)
      - real projection document class
      - real mapper method for event → projection doc
      - which MongoDB collection
@@ -283,7 +283,7 @@ The rules below are specific to this project.
 
 ## Test data factories
 
-<!-- from analysis: TestEvents factory and any other event-building utilities -->
+<!-- from analysis: TestXxxEvents factory (domain-specific) and any other event-building utilities -->
 
 ## Imports reference
 
