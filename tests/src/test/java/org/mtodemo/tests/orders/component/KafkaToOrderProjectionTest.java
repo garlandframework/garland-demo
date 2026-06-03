@@ -9,8 +9,6 @@ import org.mtodemo.tests.infrastructure.BaseTest;
 import org.mtodemo.tests.mapper.OrderTestMapper;
 import org.testng.annotations.Test;
 
-import java.time.Duration;
-
 public class KafkaToOrderProjectionTest extends BaseTest {
 
     @Test(description = "An OrderPlaced Kafka event published directly is projected into MongoDB by the projection-service")
@@ -23,7 +21,7 @@ public class KafkaToOrderProjectionTest extends BaseTest {
 
         OrderProjectionDoc expectedDoc = OrderTestMapper.INSTANCE.toProjectionDoc(event);
         Pipeline.given(expectedDoc)
-                .then(mongoClient.findById(Duration.ofMillis(1)))
+                .then(mongoClient.findById())
                 .execute();
     }
 }
