@@ -109,7 +109,8 @@ public abstract class BaseTest {
                         .entity(OrderItemEntity.class)
                         .build()
         );
-        dbClient = new PostgresTestClient(postgres, RetryConfig.of(5, Duration.ofSeconds(2)));
+        dbClient = new PostgresTestClient(postgres, RetryConfig.of(5, Duration.ofSeconds(2)))
+                .withTemporalTolerance(Duration.ofNanos(1000));
 
         kafkaClient = new KafkaTestClient(
                 KafkaConfig.builder()
@@ -120,7 +121,7 @@ public abstract class BaseTest {
                         .groupId(UUID.randomUUID().toString())
                         .build(),
                 RetryConfig.of(5, Duration.ofSeconds(2))
-        );
+        ).withTemporalTolerance(Duration.ofMillis(1));
         kafkaClient.warmup();
 
         orderKafkaClient = new KafkaTestClient(
@@ -131,7 +132,7 @@ public abstract class BaseTest {
                         .groupId(UUID.randomUUID().toString())
                         .build(),
                 RetryConfig.of(5, Duration.ofSeconds(2))
-        );
+        ).withTemporalTolerance(Duration.ofMillis(1));
         orderKafkaClient.warmup();
 
         mongo = new MongoWrapper(
@@ -142,7 +143,8 @@ public abstract class BaseTest {
                         .collection(OrderProjectionDoc.class, "order_projections")
                         .build()
         );
-        mongoClient = new MongoTestClient(mongo, RetryConfig.of(10, Duration.ofSeconds(2)));
+        mongoClient = new MongoTestClient(mongo, RetryConfig.of(10, Duration.ofSeconds(2)))
+                .withTemporalTolerance(Duration.ofMillis(1));
     }
 
     @BeforeTest

@@ -13,8 +13,6 @@ import org.mtodemo.tests.infrastructure.BaseTest;
 import org.mtodemo.tests.mapper.OrderTestMapper;
 import org.testng.annotations.Test;
 
-import java.time.Duration;
-
 public class OrderEndToEndTest extends BaseTest {
 
     @Test(description = "Placing an order triggers full system flow: persisted in Postgres, OrderPlaced event published to Kafka, projected into MongoDB")
@@ -29,7 +27,7 @@ public class OrderEndToEndTest extends BaseTest {
                 .then(Verify.allOf(
                         OrderTestMapper.toEntity().andThen(dbClient.findById()),
                         OrderTestMapper.toPlacedEvent().andThen(orderKafkaClient.consumeMatching(OrderPlacedEvent.class)),
-                        OrderTestMapper.toPlacedEvent().andThen(OrderTestMapper.toProjectionDoc()).andThen(mongoClient.findById(Duration.ofMillis(1)))
+                        OrderTestMapper.toPlacedEvent().andThen(OrderTestMapper.toProjectionDoc()).andThen(mongoClient.findById())
                 ))
                 .execute();
     }
