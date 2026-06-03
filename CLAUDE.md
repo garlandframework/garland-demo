@@ -31,6 +31,13 @@ mvn clean package -DskipTests -pl projection-service
 
 Services depend on the MTO framework being installed locally. Build the framework first if needed: `mvn install` in the framework repo.
 
+Before the first test runs, `BaseTest.@BeforeSuite` executes a three-stage readiness gate:
+1. **Stage 1** — polls `/actuator/health` on both services (up to 120 s) until both report `status: UP`. Spring Boot only reports UP when its DB, Kafka, and MongoDB connections are all established.
+2. **Stage 2** — Kafka test consumers call `warmup()` to confirm partition assignment.
+3. **Stage 3** — end-to-end smoke probe: creates a user via HTTP, waits up to 90 s for the MongoDB projection to appear, then deletes the user. If this passes, the full HTTP → Postgres → Kafka → MongoDB pipeline is confirmed operational.
+
+If the environment is not ready, the suite aborts with a clear `IllegalStateException` before any test runs.
+
 ---
 
 ## Project structure
@@ -67,6 +74,7 @@ tests/src/test/java/org/mtodemo/tests/
 Key infrastructure files:
 - `Connections.java` — all host/port/credential constants
 - `BaseTest.java` — `@BeforeSuite` wires up all clients (HTTP, DB, Kafka×2, Mongo) and acquires JWT
+- `EnvironmentReadinessChecker.java` — three-stage startup gate (health → JWT → smoke probe)
 - `TestLogger.java` — TestNG listener, logs per-test pass/fail
 
 ---

@@ -20,6 +20,7 @@ import org.modulartestorchestrator.postgres.PostgresTestClient;
 import org.modulartestorchestrator.postgres.PostgresWrapper;
 import org.mtodemo.tests.document.OrderProjectionDoc;
 import org.mtodemo.tests.document.UserProjectionDoc;
+import org.mtodemo.tests.mapper.UserTestMapper;
 import org.mtodemo.tests.entity.AddressEntity;
 import org.mtodemo.tests.entity.CarEntity;
 import org.mtodemo.tests.entity.OrderEntity;
@@ -91,6 +92,9 @@ public abstract class BaseTest {
     @BeforeSuite
     public void setUpSuite() {
         if (httpClient != null) return;
+
+        new EnvironmentReadinessChecker().waitForServicesHealthy();
+
         httpClient = new HttpTestClient(RetryConfig.of(3, Duration.ofSeconds(2)));
         TokenDto tokenDto = Pipeline.given(TestAuthRequests.login())
                 .then(httpClient.makeCall(200, TokenDto.class))
@@ -145,6 +149,42 @@ public abstract class BaseTest {
         );
         mongoClient = new MongoTestClient(mongo, RetryConfig.of(10, Duration.ofSeconds(2)))
                 .withTemporalTolerance(Duration.ofMillis(1));
+
+        runSmokeProbe();
+    }
+
+    private static void runSmokeProbe() {
+        log.info("=== Stage 3: running end-to-end smoke probe ===");
+        UserDto user = null;
+        try {
+            user = Pipeline.given(TestUserRequests.createUser())
+                    .then(httpClient.makeCall(201, UserDto.class))
+                    .execute();
+
+            MongoTestClient probeMongoClient = new MongoTestClient(
+                    mongo, RetryConfig.of(30, Duration.ofSeconds(3))
+            ).withTemporalTolerance(Duration.ofMillis(1));
+
+            Pipeline.given(user)
+                    .then(UserTestMapper.dtoToCreatedProjectionDoc())
+                    .then(probeMongoClient.findById())
+                    .execute();
+
+            log.info("=== Stage 3 passed: full pipeline is operational — tests may begin ===");
+        } catch (Exception e) {
+            throw new IllegalStateException(
+                    "Smoke probe failed — pipeline not ready: " + e.getMessage(), e);
+        } finally {
+            if (user != null) {
+                try {
+                    Pipeline.given(TestUserRequests.deleteUser(user.getUuid()))
+                            .then(httpClient.makeCall(204, Void.class))
+                            .execute();
+                } catch (Exception ignored) {
+                    log.warn("Smoke probe cleanup: could not delete probe user {}", user.getUuid());
+                }
+            }
+        }
     }
 
     @BeforeTest
