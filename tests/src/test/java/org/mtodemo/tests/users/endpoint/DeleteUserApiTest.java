@@ -26,6 +26,7 @@ public class DeleteUserApiTest extends BaseTest {
     public void deleteUser_removedFromDb() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         Pipeline.given(TestUserRequests.deleteUser(created.getUuid()))

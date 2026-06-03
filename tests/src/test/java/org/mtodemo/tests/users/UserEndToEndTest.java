@@ -18,6 +18,7 @@ public class UserEndToEndTest extends BaseTest {
     public void createUser_dbThenKafka() {
         Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .then(Verify.allOf(
                         UserTestMapper.toEntity().andThen(dbClient.findById()),
                         UserTestMapper.toCreatedEvent().andThen(kafkaClient.consumeMatching(UserCreatedEvent.class))
@@ -29,6 +30,7 @@ public class UserEndToEndTest extends BaseTest {
     public void createUser_publishesKafkaEvent() {
         Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .then(UserTestMapper.toCreatedEvent())
                 .then(kafkaClient.consumeMatching(UserCreatedEvent.class))
                 .execute();
@@ -38,6 +40,7 @@ public class UserEndToEndTest extends BaseTest {
     public void createUser_fullSystemFlow() {
         Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .then(Verify.allOf(
                         UserTestMapper.toEntity().andThen(dbClient.findById()),
                         UserTestMapper.toCreatedEvent().andThen(kafkaClient.consumeMatching(UserCreatedEvent.class)),
@@ -50,6 +53,7 @@ public class UserEndToEndTest extends BaseTest {
     public void updateUser_fullSystemFlow() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         UserDto updatePayload = TestUsers.defaultUser();
@@ -67,6 +71,7 @@ public class UserEndToEndTest extends BaseTest {
     public void deleteUser_fullSystemFlow() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         Pipeline.given(TestUserRequests.deleteUser(created.getUuid()))

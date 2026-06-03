@@ -22,6 +22,7 @@ public class UpdateUserApiTest extends BaseTest {
     public void updateUser_persistedInDb() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         UserDto updatePayload = TestUsers.defaultUser();
@@ -37,6 +38,7 @@ public class UpdateUserApiTest extends BaseTest {
     public void updateUser_requiredFieldsOnly_clearsOptionalFields() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         UserDto updatePayload = TestUsers.requiredFieldsOnlyUser();
@@ -64,6 +66,7 @@ public class UpdateUserApiTest extends BaseTest {
     public void updateUser_blankName_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         Pipeline.given(TestUserRequests.updateUser(created.getUuid(), TestUsers.builder().name("").build()))
@@ -76,6 +79,7 @@ public class UpdateUserApiTest extends BaseTest {
     public void updateUser_nullName_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         Pipeline.given(TestUserRequests.updateUser(created.getUuid(), TestUsers.builder().name(null).build()))
@@ -88,6 +92,7 @@ public class UpdateUserApiTest extends BaseTest {
     public void updateUser_blankSurname_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         Pipeline.given(TestUserRequests.updateUser(created.getUuid(), TestUsers.builder().surname("").build()))
@@ -100,6 +105,7 @@ public class UpdateUserApiTest extends BaseTest {
     public void updateUser_nullSurname_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         Pipeline.given(TestUserRequests.updateUser(created.getUuid(), TestUsers.builder().surname(null).build()))
@@ -112,6 +118,7 @@ public class UpdateUserApiTest extends BaseTest {
     public void updateUser_blankAddressStreet_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         UserDto update = TestUsers.builder()
@@ -127,6 +134,7 @@ public class UpdateUserApiTest extends BaseTest {
     public void updateUser_nullAddressStreet_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         UserDto update = TestUsers.builder()
@@ -142,6 +150,7 @@ public class UpdateUserApiTest extends BaseTest {
     public void updateUser_blankAddressCity_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         UserDto update = TestUsers.builder()
@@ -157,6 +166,7 @@ public class UpdateUserApiTest extends BaseTest {
     public void updateUser_nullAddressCity_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         UserDto update = TestUsers.builder()
@@ -172,6 +182,7 @@ public class UpdateUserApiTest extends BaseTest {
     public void updateUser_blankAddressCountry_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         UserDto update = TestUsers.builder()
@@ -187,6 +198,7 @@ public class UpdateUserApiTest extends BaseTest {
     public void updateUser_nullAddressCountry_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         UserDto update = TestUsers.builder()
@@ -202,6 +214,7 @@ public class UpdateUserApiTest extends BaseTest {
     public void updateUser_blankAddressZipCode_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         UserDto update = TestUsers.builder()
@@ -217,6 +230,7 @@ public class UpdateUserApiTest extends BaseTest {
     public void updateUser_nullAddressZipCode_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         UserDto update = TestUsers.builder()
@@ -232,6 +246,7 @@ public class UpdateUserApiTest extends BaseTest {
     public void updateUser_blankCarPlateNumber_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         UserDto update = TestUsers.builder()
@@ -247,6 +262,7 @@ public class UpdateUserApiTest extends BaseTest {
     public void updateUser_nullCarPlateNumber_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         UserDto update = TestUsers.builder()
@@ -262,6 +278,7 @@ public class UpdateUserApiTest extends BaseTest {
     public void updateUser_blankCarManufacturer_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         UserDto update = TestUsers.builder()
@@ -277,6 +294,7 @@ public class UpdateUserApiTest extends BaseTest {
     public void updateUser_nullCarManufacturer_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         UserDto update = TestUsers.builder()
@@ -292,6 +310,7 @@ public class UpdateUserApiTest extends BaseTest {
     public void updateUser_blankCarModel_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         UserDto update = TestUsers.builder()
@@ -307,6 +326,7 @@ public class UpdateUserApiTest extends BaseTest {
     public void updateUser_nullCarModel_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         UserDto update = TestUsers.builder()
@@ -324,6 +344,7 @@ public class UpdateUserApiTest extends BaseTest {
     public void updateUser_nameTooLong_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         Pipeline.given(TestUserRequests.updateUser(created.getUuid(), TestUsers.builder().name("a".repeat(101)).build()))
@@ -336,6 +357,7 @@ public class UpdateUserApiTest extends BaseTest {
     public void updateUser_surnameTooLong_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         Pipeline.given(TestUserRequests.updateUser(created.getUuid(), TestUsers.builder().surname("a".repeat(101)).build()))
@@ -348,6 +370,7 @@ public class UpdateUserApiTest extends BaseTest {
     public void updateUser_addressStreetTooLong_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         UserDto update = TestUsers.builder()
@@ -363,6 +386,7 @@ public class UpdateUserApiTest extends BaseTest {
     public void updateUser_addressCityTooLong_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         UserDto update = TestUsers.builder()
@@ -378,6 +402,7 @@ public class UpdateUserApiTest extends BaseTest {
     public void updateUser_addressCountryTooLong_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         UserDto update = TestUsers.builder()
@@ -393,6 +418,7 @@ public class UpdateUserApiTest extends BaseTest {
     public void updateUser_addressZipCodeTooLong_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         UserDto update = TestUsers.builder()
@@ -408,6 +434,7 @@ public class UpdateUserApiTest extends BaseTest {
     public void updateUser_carPlateNumberTooLong_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         UserDto update = TestUsers.builder()
@@ -423,6 +450,7 @@ public class UpdateUserApiTest extends BaseTest {
     public void updateUser_carManufacturerTooLong_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         UserDto update = TestUsers.builder()
@@ -438,6 +466,7 @@ public class UpdateUserApiTest extends BaseTest {
     public void updateUser_carModelTooLong_returns400() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         UserDto update = TestUsers.builder()

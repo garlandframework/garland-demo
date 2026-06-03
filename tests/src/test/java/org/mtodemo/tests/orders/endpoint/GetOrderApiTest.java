@@ -33,11 +33,13 @@ public class GetOrderApiTest extends BaseTest {
     public void getOrderById_returnsCorrectOrder() {
         UserDto user = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         OrderDto created = Pipeline.given(TestOrderRequests.placeOrder(
                         TestOrders.builder().userId(user.getUuid()).build()))
                 .then(httpClient.makeCall(201, OrderDto.class))
+                .then(trackOrder())
                 .execute();
 
         Pipeline.given(TestOrderRequests.getOrder(created.getUuid()))
@@ -52,16 +54,19 @@ public class GetOrderApiTest extends BaseTest {
     public void getOrdersByUser_returnsPlacedOrders() {
         UserDto user = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         OrderDto first = Pipeline.given(TestOrderRequests.placeOrder(
                         TestOrders.builder().userId(user.getUuid()).build()))
                 .then(httpClient.makeCall(201, OrderDto.class))
+                .then(trackOrder())
                 .execute();
 
         OrderDto second = Pipeline.given(TestOrderRequests.placeOrder(
                         TestOrders.builder().userId(user.getUuid()).build()))
                 .then(httpClient.makeCall(201, OrderDto.class))
+                .then(trackOrder())
                 .execute();
 
         Pipeline.given(TestOrderRequests.getOrdersByUser(user.getUuid()))

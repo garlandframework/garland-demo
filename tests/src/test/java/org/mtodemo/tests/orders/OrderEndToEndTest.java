@@ -21,6 +21,7 @@ public class OrderEndToEndTest extends BaseTest {
     public void placeOrder_fullSystemFlow() {
         UserDto user = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         Pipeline.given(TestOrderRequests.placeOrder(TestOrders.builder().userId(user.getUuid()).build()))
@@ -37,11 +38,13 @@ public class OrderEndToEndTest extends BaseTest {
     public void cancelOrder_fullSystemFlow() {
         UserDto user = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         OrderDto created = Pipeline.given(TestOrderRequests.placeOrder(
                         TestOrders.builder().userId(user.getUuid()).build()))
                 .then(httpClient.makeCall(201, OrderDto.class))
+                .then(trackOrder())
                 .execute();
 
         OrderDto cancelled = Pipeline.given(TestOrderRequests.cancelOrder(created.getUuid()))

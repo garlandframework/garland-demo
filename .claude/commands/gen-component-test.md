@@ -41,6 +41,7 @@ Does not assert MongoDB — that is projection-service's responsibility.
 public void createUser_persistedInDb_andPublishesKafkaEvent() {
     Pipeline.given(TestUserRequests.createUser())
             .then(httpClient.makeCall(201, UserDto.class))
+            .then(trackUser())
             .then(Verify.allOf(
                     UserTestMapper.toEntity().andThen(dbClient.findById()),
                     UserTestMapper.toCreatedEvent().andThen(kafkaClient.consumeMatching(UserCreatedEvent.class))
@@ -108,6 +109,7 @@ Component tests share the Kafka topic with other test levels. Run them sequentia
 - **No validation/error tests** — those belong in endpoint tests
 - **Cross-domain FK in Slice 1 happy-path tests** — `PLACEHOLDER_USER_ID` is valid for validation (400) tests. For happy-path Slice 1 tests that persist an order, create a real user first and use `user.getUuid()`. Services validate FK existence at the database layer, not just at annotation validation.
 - **Use the correct Kafka client** — `kafkaClient` for user-domain events, `orderKafkaClient` for order-domain events
+- **Track HTTP-created resources** — add `.then(trackUser())` after every `makeCall(201, UserDto.class)` and `.then(trackOrder())` after every `makeCall(201, OrderDto.class)` in Slice 1 tests
 
 ## Imports reference
 
@@ -125,6 +127,15 @@ import org.mtodemo.tests.mapper.UserTestMapper;
 import org.testng.annotations.Test;
 import java.time.Duration;
 ```
+
+## Cleanup
+
+Every test that creates a user via HTTP must register it for cleanup by adding `.then(trackUser())` after `makeCall(201, UserDto.class)`. Every test that creates an order must add `.then(trackOrder())` after `makeCall(201, OrderDto.class)`.
+
+`BaseTest` calls the delete/cancel API endpoint for each tracked resource in `@AfterMethod(alwaysRun = true)`, regardless of test pass or fail. Cleanup failures are logged as warnings and never fail the test.
+
+- This applies to Slice 1 (HTTP entry point) — Slice 2 tests that publish events directly via `kafkaClient.publish()` do not create DB-persisted resources through HTTP, so they do not need `trackUser()`
+- Never truncate test data directly in the database — it bypasses the application layer and leaves MongoDB projections and Kafka state inconsistent
 
 ---
 

@@ -24,6 +24,7 @@ public class GetUserByIdApiTest extends BaseTest {
     public void getUserById_returnsCorrectUser() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         Pipeline.given(TestUserRequests.getUser(created.getUuid()))

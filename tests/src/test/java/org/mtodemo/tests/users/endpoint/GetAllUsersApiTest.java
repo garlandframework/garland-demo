@@ -27,10 +27,12 @@ public class GetAllUsersApiTest extends BaseTest {
     public void getAllUsers_containsCreatedUsers() {
         UserDto first = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         UserDto second = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         Pipeline.given(TestUserRequests.getAllUsers())

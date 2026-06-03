@@ -22,6 +22,7 @@ public class UserFlowTest extends BaseTest {
     public void createThenGet_userRetrievable() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         Pipeline.given(TestUserRequests.getUser(created.getUuid()))
@@ -34,6 +35,7 @@ public class UserFlowTest extends BaseTest {
     public void createThenGetAll_listContainsUser() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         Pipeline.given(TestUserRequests.getAllUsers())
@@ -46,6 +48,7 @@ public class UserFlowTest extends BaseTest {
     public void createThenUpdate_thenGet_returnsUpdatedData() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         UserDto updatePayload = TestUsers.defaultUser();
@@ -63,6 +66,7 @@ public class UserFlowTest extends BaseTest {
     public void createThenUpdate_thenGetAll_listContainsUpdatedData() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         UserDto updatePayload = TestUsers.defaultUser();
@@ -82,6 +86,7 @@ public class UserFlowTest extends BaseTest {
     public void createThenDelete_thenGet_returns404() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         Pipeline.given(TestUserRequests.deleteUser(created.getUuid()))
@@ -98,6 +103,7 @@ public class UserFlowTest extends BaseTest {
     public void createThenDelete_thenGetAll_doesNotContainUser() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         Pipeline.given(TestUserRequests.deleteUser(created.getUuid()))
@@ -117,6 +123,7 @@ public class UserFlowTest extends BaseTest {
     public void createThenDelete_thenDeleteAgain_returns404() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         Pipeline.given(TestUserRequests.deleteUser(created.getUuid()))
@@ -135,10 +142,12 @@ public class UserFlowTest extends BaseTest {
     public void createTwo_updateOne_thenGetOther_unchanged() {
         UserDto userA = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         UserDto userB = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         Pipeline.given(TestUserRequests.updateUser(userA.getUuid(), TestUsers.defaultUser()))
@@ -155,10 +164,12 @@ public class UserFlowTest extends BaseTest {
     public void createTwo_deleteOne_thenGetAll_otherStillPresent() {
         UserDto userA = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         UserDto userB = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         Pipeline.given(TestUserRequests.deleteUser(userA.getUuid()))
@@ -177,6 +188,7 @@ public class UserFlowTest extends BaseTest {
     public void fullCrudLifecycle() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         Pipeline.given(TestUserRequests.getUser(created.getUuid()))

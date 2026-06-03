@@ -18,10 +18,12 @@ public class OrderApiToKafkaTest extends BaseTest {
     public void placeOrder_persistedInDb_andPublishesKafkaEvent() {
         UserDto user = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         Pipeline.given(TestOrderRequests.placeOrder(TestOrders.builder().userId(user.getUuid()).build()))
                 .then(httpClient.makeCall(201, OrderDto.class))
+                .then(trackOrder())
                 .then(Verify.allOf(
                         OrderTestMapper.toEntity().andThen(dbClient.findById()),
                         OrderTestMapper.toPlacedEvent().andThen(orderKafkaClient.consumeMatching(OrderPlacedEvent.class))

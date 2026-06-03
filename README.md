@@ -23,7 +23,7 @@ Two Spring Boot microservices connected through Kafka, with a complete integrati
                                        │
                         ┌──────────────▼─────────────────┐
                         │    projection-service :8081    │
-                        │                                │
+                        │                                 │
                         │  /api/projections   MongoDB    │
                         │                  (projectiondb)│
                         └────────────────────────────────┘

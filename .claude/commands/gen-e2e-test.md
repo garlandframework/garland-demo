@@ -47,7 +47,7 @@ A full e2e test walks this entire chain in order. Each system is asserted explic
 | Field | Type | Purpose |
 |---|---|---|
 | `httpClient` | `HttpTestClient` | HTTP calls to user-service |
-| `dbClient` | `DbTestClient` | Postgres via Hibernate |
+| `dbClient` | `PostgresTestClient` | Postgres via Hibernate |
 | `kafkaClient` | `KafkaTestClient` | User-domain Kafka — `user.created`, `user.updated`, `user.deleted` |
 | `orderKafkaClient` | `KafkaTestClient` | Order-domain Kafka — `order.placed`, `order.cancelled` |
 | `mongoClient` | `MongoTestClient` | MongoDB projections |
@@ -67,6 +67,7 @@ After the HTTP call, use `Verify.allOf()` to fan out to all independent side-eff
 public void createUser_fullSystemFlow() {
     Pipeline.given(TestUserRequests.createUser())
             .then(httpClient.makeCall(201, UserDto.class))
+            .then(trackUser())
             .then(Verify.allOf(
                     UserTestMapper.toEntity().andThen(dbClient.findById()),
                     UserTestMapper.toCreatedEvent().andThen(kafkaClient.consumeMatching(UserCreatedEvent.class)),
@@ -81,6 +82,7 @@ public void createUser_fullSystemFlow() {
 public void updateUser_fullSystemFlow() {
     UserDto created = Pipeline.given(TestUserRequests.createUser())
             .then(httpClient.makeCall(201, UserDto.class))
+            .then(trackUser())
             .execute();
 
     UserDto updatePayload = TestUsers.defaultUser();
@@ -104,6 +106,7 @@ The delete returns `Void`, so start a new pipeline from the pre-delete `created`
 public void deleteUser_fullSystemFlow() {
     UserDto created = Pipeline.given(TestUserRequests.createUser())
             .then(httpClient.makeCall(201, UserDto.class))
+            .then(trackUser())
             .execute();
 
     Pipeline.given(TestUserRequests.deleteUser(created.getUuid()))
@@ -228,6 +231,7 @@ TestUsers.requiredFieldsOnlyUser()         // name + surname only
 - **description** reads as a system-level story: "Creating a user triggers full system flow: ...", not "Test create e2e"
 - **Cross-domain FK — always create the dependency first** — `PLACEHOLDER_USER_ID` must not be used in e2e tests. E2e tests persist to the database; services validate FK existence at the service/DB layer. Create the referenced entity in a setup pipeline and use the returned UUID.
 - **Use the correct Kafka client per domain** — `kafkaClient` for `user.*` events, `orderKafkaClient` for `order.*` events
+- **Track every created resource** — call `.then(trackUser())` after every `makeCall(201, UserDto.class)` and `.then(trackOrder())` after every `makeCall(201, OrderDto.class)`, even if the test itself performs the deletion
 
 ## Imports reference
 
@@ -246,6 +250,15 @@ import org.testng.annotations.Test;
 import java.time.Duration;
 import java.time.Instant;
 ```
+
+## Cleanup
+
+Every test that creates a user must add `.then(trackUser())` after `makeCall(201, UserDto.class)`. Every test that creates an order must add `.then(trackOrder())` after `makeCall(201, OrderDto.class)`.
+
+`BaseTest` calls the delete/cancel API endpoint for each tracked resource in `@AfterMethod(alwaysRun = true)`, regardless of test pass or fail. Cleanup failures are logged as warnings and never fail the test.
+
+- Always track even when the test itself performs the deletion — if the test fails mid-flow, the tracker is the only safety net
+- Never truncate test data directly in the database — it bypasses the application layer and leaves Kafka events and MongoDB projections in an inconsistent state
 
 ---
 

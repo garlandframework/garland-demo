@@ -15,6 +15,7 @@ public class UserApiToKafkaTest extends BaseTest {
     public void createUser_persistedInDb_andPublishesKafkaEvent() {
         Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .then(Verify.allOf(
                         UserTestMapper.toEntity().andThen(dbClient.findById()),
                         UserTestMapper.toCreatedEvent().andThen(kafkaClient.consumeMatching(UserCreatedEvent.class))

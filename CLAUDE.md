@@ -106,3 +106,4 @@ For negative auth tests, use `httpClient.withoutHeader("Authorization")` or `htt
 - **allOf** for fan-out: when one HTTP response triggers DB + Kafka + Mongo assertions, use `Verify.allOf()` not sequential chains.
 - **Temporal tolerance**: MongoDB truncates `Instant` to milliseconds — always use `mongoClient.findById(Duration.ofMillis(1))` when the document contains a timestamp.
 - Test DTOs duplicate service classes intentionally — tests must not depend on service internals.
+- **Resource cleanup**: Every test that creates a user must call `.then(trackUser())` after `makeCall(201, UserDto.class)`. Every test that creates an order must call `.then(trackOrder())` after `makeCall(201, OrderDto.class)`. `BaseTest` calls the API delete/cancel endpoint for each tracked resource in `@AfterMethod`. Never truncate data directly in the database — it leaves Kafka and MongoDB in an inconsistent state.

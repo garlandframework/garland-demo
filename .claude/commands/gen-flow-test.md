@@ -55,6 +55,7 @@ Each operation in the flow is a **separate pipeline**. State (the UUID, the DTO)
 public void createThenGet_userRetrievable() throws Exception {
     UserDto created = Pipeline.given(TestUserRequests.createUser())
             .then(httpClient.makeCall(201, UserDto.class))
+            .then(trackUser())
             .execute();
 
     Pipeline.given(TestUserRequests.getUser(created.getUuid()))
@@ -69,6 +70,7 @@ public void createThenGet_userRetrievable() throws Exception {
 public void createThenUpdate_thenGet_returnsUpdatedData() throws Exception {
     UserDto created = Pipeline.given(TestUserRequests.createUser())
             .then(httpClient.makeCall(201, UserDto.class))
+            .then(trackUser())
             .execute();
 
     UserDto updatePayload = TestUsers.defaultUser();
@@ -88,6 +90,7 @@ public void createThenUpdate_thenGet_returnsUpdatedData() throws Exception {
 public void createThenDelete_thenGet_returns404() throws Exception {
     UserDto created = Pipeline.given(TestUserRequests.createUser())
             .then(httpClient.makeCall(201, UserDto.class))
+            .then(trackUser())
             .execute();
 
     Pipeline.given(TestUserRequests.deleteUser(created.getUuid()))
@@ -106,6 +109,7 @@ public void createThenDelete_thenGet_returns404() throws Exception {
 public void createThenDelete_thenGetAll_doesNotContainUser() throws Exception {
     UserDto created = Pipeline.given(TestUserRequests.createUser())
             .then(httpClient.makeCall(201, UserDto.class))
+            .then(trackUser())
             .execute();
 
     Pipeline.given(TestUserRequests.deleteUser(created.getUuid()))
@@ -130,6 +134,7 @@ public void createThenDelete_thenGetAll_doesNotContainUser() throws Exception {
 - **Use `Verify.matching`** for response body checks; use `Verify.containsAll` for list inclusion; use `assertThat(...).doesNotContain(...)` for list exclusion
 - **description** should read as a user story: "Created user can be retrieved by id", not "Test create then get"
 - **Do not re-test persistence in DB** — that is covered by endpoint tests; flow tests only verify API-level consistency
+- **Track every created user** — add `.then(trackUser())` after every `makeCall(201, UserDto.class)`, even in tests that delete the user themselves
 
 ## Imports reference
 
@@ -157,6 +162,21 @@ TestUserRequests.getUser(UUID id)
 TestUserRequests.getAllUsers()
 TestUserRequests.deleteUser(UUID id)
 ```
+
+## Cleanup
+
+Every test that creates a user must register it for cleanup by adding `.then(trackUser())` immediately after `makeCall(201, UserDto.class)`:
+
+```java
+UserDto created = Pipeline.given(TestUserRequests.createUser())
+        .then(httpClient.makeCall(201, UserDto.class))
+        .then(trackUser())
+        .execute();
+```
+
+`BaseTest` calls `DELETE /api/users/{id}` for each tracked user in `@AfterMethod(alwaysRun = true)`, regardless of test pass or fail. This applies even to tests that delete the user themselves — if the test fails before the delete step, the tracker ensures the resource is still cleaned up.
+
+Never truncate test data directly in the database — it bypasses the application layer and leaves MongoDB projections and Kafka state inconsistent.
 
 ---
 

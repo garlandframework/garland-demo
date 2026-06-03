@@ -29,11 +29,13 @@ public class CancelOrderApiTest extends BaseTest {
     public void cancelOrder_statusUpdatedInDb() {
         UserDto user = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         OrderDto created = Pipeline.given(TestOrderRequests.placeOrder(
                         TestOrders.builder().userId(user.getUuid()).build()))
                 .then(httpClient.makeCall(201, OrderDto.class))
+                .then(trackOrder())
                 .execute();
 
         OrderDto expectedCancelled = OrderDto.builder()

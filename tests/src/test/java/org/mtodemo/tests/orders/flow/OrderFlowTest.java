@@ -17,11 +17,13 @@ public class OrderFlowTest extends BaseTest {
     public void placeThenGetById_orderRetrievable() {
         UserDto user = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         OrderDto created = Pipeline.given(TestOrderRequests.placeOrder(
                         TestOrders.builder().userId(user.getUuid()).build()))
                 .then(httpClient.makeCall(201, OrderDto.class))
+                .then(trackOrder())
                 .execute();
 
         Pipeline.given(TestOrderRequests.getOrder(created.getUuid()))
@@ -34,11 +36,13 @@ public class OrderFlowTest extends BaseTest {
     public void placeThenCancel_thenGetById_statusIsCancelled() {
         UserDto user = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         OrderDto created = Pipeline.given(TestOrderRequests.placeOrder(
                         TestOrders.builder().userId(user.getUuid()).build()))
                 .then(httpClient.makeCall(201, OrderDto.class))
+                .then(trackOrder())
                 .execute();
 
         Pipeline.given(TestOrderRequests.cancelOrder(created.getUuid()))

@@ -34,7 +34,7 @@ tests/src/test/java/org/mtodemo/tests/
 | Field | Type | Purpose |
 |---|---|---|
 | `httpClient` | `HttpTestClient` | HTTP calls to user-service and projection-service |
-| `dbClient` | `DbTestClient` | Postgres via Hibernate |
+| `dbClient` | `PostgresTestClient` | Postgres via Hibernate |
 | `kafkaClient` | `KafkaTestClient` | User-domain Kafka (`user.created`, …) |
 | `orderKafkaClient` | `KafkaTestClient` | Order-domain Kafka (`order.placed`, …) |
 | `mongoClient` | `MongoTestClient` | MongoDB projections |
@@ -48,6 +48,7 @@ For **happy-path tests** (201/200 expected) that persist data, the referenced en
 ```java
 UserDto user = Pipeline.given(TestUserRequests.createUser())
         .then(httpClient.makeCall(201, UserDto.class))
+        .then(trackUser())
         .execute();
 
 Pipeline.given(TestOrderRequests.placeOrder(
@@ -256,6 +257,22 @@ UserDto user = TestUsers.builder()
         .cars(List.of(TestCars.builder().plateNumber(null).build()))
         .build();
 ```
+
+## Cleanup
+
+Every test that creates a user must register it for cleanup by adding `.then(trackUser())` immediately after `makeCall(201, UserDto.class)`. Every test that creates an order must add `.then(trackOrder())` after `makeCall(201, OrderDto.class)`.
+
+```java
+UserDto user = Pipeline.given(TestUserRequests.createUser())
+        .then(httpClient.makeCall(201, UserDto.class))
+        .then(trackUser())
+        .execute();
+```
+
+`BaseTest` calls the delete/cancel API endpoint for each tracked resource in `@AfterMethod(alwaysRun = true)`, regardless of test pass or fail. Cleanup failures are logged as warnings and never fail the test.
+
+- Always call `trackUser()`/`trackOrder()` even if the test itself deletes or cancels the resource — if the test fails before its own cleanup step, the tracker ensures it still runs
+- Never truncate test data directly in the database — it bypasses the application layer and leaves MongoDB projections and Kafka state inconsistent
 
 ---
 

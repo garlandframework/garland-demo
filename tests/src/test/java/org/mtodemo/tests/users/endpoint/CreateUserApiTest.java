@@ -22,6 +22,7 @@ public class CreateUserApiTest extends BaseTest {
         HttpCallRequest<UserDto> request = TestUserRequests.createUser();
         Pipeline.given(request)
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .then(Verify.matching(request.dto()))
                 .then(UserTestMapper.toEntity())
                 .then(dbClient.findById())

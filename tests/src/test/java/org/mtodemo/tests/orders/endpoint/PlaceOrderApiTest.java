@@ -23,12 +23,14 @@ public class PlaceOrderApiTest extends BaseTest {
     public void placeOrder_persistedInDb() {
         UserDto user = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
 
         HttpCallRequest<OrderDto> request = TestOrderRequests.placeOrder(
                 TestOrders.builder().userId(user.getUuid()).build());
         Pipeline.given(request)
                 .then(httpClient.makeCall(201, OrderDto.class))
+                .then(trackOrder())
                 .then(Verify.matching(request.dto()))
                 .then(OrderTestMapper.toEntity())
                 .then(dbClient.findById())
