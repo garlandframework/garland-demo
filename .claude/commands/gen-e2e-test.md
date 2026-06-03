@@ -160,13 +160,13 @@ Always use the static bridges on the mapper interface (not `Step.lift(INSTANCE::
 
 ```java
 dbClient.findById()                           // asserts record exists and matches — throws if absent
-dbClient.findById(Duration temporalTolerance) // same with timestamp tolerance (Postgres precision)
+dbClient.findById(Duration temporalTolerance) // override default tolerance for this call
 dbClient.findByFields()                       // asserts unique match — throws if 0 or >1 results
 dbClient.countByFields()                      // returns Long count of matching records
 dbClient.notExistsById()                      // asserts record is absent — throws if present
 
 mongoClient.findById()                            // asserts document exists and matches — throws if absent
-mongoClient.findById(Duration temporalTolerance)  // same with timestamp tolerance — use for any doc with timestamp fields
+mongoClient.findById(Duration temporalTolerance)  // override default tolerance for this call
 mongoClient.findByFields()                        // asserts unique match — throws if 0 or >1 results
 mongoClient.countByFields()                       // returns Long count of matching documents
 mongoClient.notExistsById()                       // asserts document is absent — throws if present
@@ -183,13 +183,13 @@ Pipeline.given(template)
     .execute();
 ```
 
-Always use `mongoClient.findById(Duration.ofMillis(1))` when the expected document contains a timestamp field — MongoDB truncates nanoseconds to milliseconds and exact comparison will fail.
+`mongoClient.findById()` applies the client's default tolerance automatically (set via `withTemporalTolerance()` in `BaseTest`). Use `findById(Duration)` only when overriding for a specific call that needs a higher tolerance.
 
 ## Temporal tolerance
 
 Two situations require temporal tolerance:
 
-**MongoDB precision truncation** — MongoDB stores `Instant` with millisecond precision. Any expected document with a timestamp field must use `findById(Duration.ofMillis(1))`.
+**Storage precision truncation** — MongoDB truncates `Instant` to milliseconds; PostgreSQL to microseconds. The client-level defaults set via `withTemporalTolerance()` in `BaseTest` handle this automatically — use bare `findById()` and `consumeMatching()` in tests.
 
 **Service-generated timestamps** — When the service sets a timestamp internally (e.g. `eventTimestamp = Instant.now()`), capture the test start time and use it as the expected value with a tolerance equal to the maximum acceptable processing delay:
 

@@ -65,14 +65,14 @@ public void userCreatedEvent_projectedToMongo() {
 
     UserProjectionDoc expectedDoc = UserTestMapper.INSTANCE.toProjectionDoc(event);
     Pipeline.given(expectedDoc)
-            .then(mongoClient.findById(Duration.ofMillis(1)))
+            .then(mongoClient.findById())
             .execute();
 }
 ```
 
 Two pipelines: one to publish the event, one to assert the projection. The split reflects two distinct operations.
 
-**MongoDB precision** — always use `mongoClient.findById(Duration.ofMillis(1))` when the expected document contains a timestamp field. MongoDB truncates `Instant` nanoseconds to milliseconds; exact comparison will fail without tolerance.
+**MongoDB precision** — `mongoClient.findById()` applies the client's default tolerance automatically (set via `withTemporalTolerance()` in `BaseTest`). Use the explicit `findById(Duration)` overload only when a specific call needs a higher tolerance than the default.
 
 **Counting records by field** — use `countByFields()` + `check.equalTo(NL)` when asserting how many documents/rows match a field pattern. `findByFields()` is strict and throws if more than one result is found — use it only when you expect exactly one match.
 
