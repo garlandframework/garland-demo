@@ -4,7 +4,6 @@ import org.modulartestorchestrator.base.Pipeline;
 import org.modulartestorchestrator.base.checks.Verify;
 import org.mtodemo.tests.dto.ErrorDto;
 import org.mtodemo.tests.dto.UserDto;
-import org.mtodemo.tests.entity.UserEntity;
 import org.mtodemo.tests.factory.TestUserRequests;
 import org.mtodemo.tests.infrastructure.BaseTest;
 import org.mtodemo.tests.mapper.UserTestMapper;
@@ -33,8 +32,8 @@ public class DeleteUserApiTest extends BaseTest {
                 .then(httpClient.makeCall(204, Void.class))
                 .execute();
 
-        UserEntity entity = UserTestMapper.INSTANCE.toEntity(created);
-        Pipeline.given(entity)
+        Pipeline.given(created)
+                .then(UserTestMapper.toEntity())
                 .then(dbClient.notExistsById())
                 .execute();
     }
