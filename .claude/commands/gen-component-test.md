@@ -57,7 +57,7 @@ Does not go through HTTP — uses `TestEvents` to build the event independently.
 ```java
 @Test(description = "A UserCreated Kafka event published directly is projected into MongoDB by the projection-service")
 public void userCreatedEvent_projectedToMongo() {
-    UserCreatedEvent event = TestEvents.defaultUserCreatedEvent();
+    UserCreatedEvent event = TestUserEvents.defaultUserCreatedEvent();
 
     Pipeline.given(new KafkaMessage<>(event.userId().toString(), event))
             .then(kafkaClient.publish())   // kafkaClient has user.created as first topic
@@ -91,10 +91,13 @@ Pipeline.given(template)
 
 ```java
 // Build a UserCreatedEvent independently of HTTP — no user-service involved
-TestEvents.defaultUserCreatedEvent()
+TestUserEvents.defaultUserCreatedEvent()
+
+// Build an OrderPlacedEvent independently
+TestOrderEvents.defaultOrderPlacedEvent()
 ```
 
-`TestEvents` constructs events from scratch using datafaker. Use it whenever the test entry point is Kafka, not HTTP. Do NOT derive events from HTTP responses in `KafkaToProjectionTest` — that would reintroduce a user-service dependency.
+`TestUserEvents` / `TestOrderEvents` construct events from scratch using datafaker. Use them whenever the test entry point is Kafka, not HTTP. Do NOT derive events from HTTP responses in `KafkaToProjectionTest` — that would reintroduce a user-service dependency.
 
 ## Sequential execution
 
@@ -117,13 +120,17 @@ Component tests share the Kafka topic with other test levels. Run them sequentia
 import org.modulartestorchestrator.base.Pipeline;
 import org.modulartestorchestrator.base.checks.Verify;
 import org.modulartestorchestrator.kafka.model.KafkaMessage;
-import org.mtodemo.tests.document.UserProjectionDoc;
-import org.mtodemo.tests.dto.UserDto;
-import org.mtodemo.tests.event.UserCreatedEvent;
-import org.mtodemo.tests.factory.TestEvents;
-import org.mtodemo.tests.factory.TestUserRequests;
-import org.mtodemo.tests.infrastructure.BaseTest;
-import org.mtodemo.tests.mapper.UserTestMapper;
+import org.mtodemo.tests.support.base.BaseTest;
+import org.mtodemo.tests.support.users.document.UserProjectionDoc;
+import org.mtodemo.tests.support.users.dto.UserDto;
+import org.mtodemo.tests.support.users.event.UserCreatedEvent;
+import org.mtodemo.tests.support.users.factory.TestUserEvents;
+import org.mtodemo.tests.support.users.factory.TestUserRequests;
+import org.mtodemo.tests.support.users.mapper.UserTestMapper;
+import org.mtodemo.tests.support.orders.document.OrderProjectionDoc;
+import org.mtodemo.tests.support.orders.event.OrderPlacedEvent;
+import org.mtodemo.tests.support.orders.factory.TestOrderEvents;
+import org.mtodemo.tests.support.orders.mapper.OrderTestMapper;
 import org.testng.annotations.Test;
 import java.time.Duration;
 ```

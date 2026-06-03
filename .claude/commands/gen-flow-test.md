@@ -143,11 +143,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import org.assertj.core.api.Assertions.assertThat;
 import org.modulartestorchestrator.base.Pipeline;
 import org.modulartestorchestrator.base.checks.Verify;
-import org.mtodemo.tests.dto.ErrorDto;
-import org.mtodemo.tests.dto.UserDto;
-import org.mtodemo.tests.factory.TestUserRequests;
-import org.mtodemo.tests.factory.TestUsers;
-import org.mtodemo.tests.infrastructure.BaseTest;
+import org.mtodemo.tests.support.base.BaseTest;
+import org.mtodemo.tests.support.common.dto.ErrorDto;
+import org.mtodemo.tests.support.users.dto.UserDto;
+import org.mtodemo.tests.support.users.factory.TestUserRequests;
+import org.mtodemo.tests.support.users.factory.TestUsers;
 import org.testng.annotations.Test;
 import java.util.List;
 ```

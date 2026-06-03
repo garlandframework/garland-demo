@@ -56,13 +56,25 @@ restart-clean.sh     Rebuild + restart helper
 
 ```
 tests/src/test/java/org/mtodemo/tests/
-  infrastructure/     BaseTest, Connections, TestLogger
-  dto/                HTTP-layer DTOs (UserDto, OrderDto, ErrorDto, LoginRequest, …)
-  entity/             Hibernate entities for Postgres assertions
-  document/           MongoDB document classes for projection assertions
-  event/              Kafka event record types
-  factory/            Test data builders (TestUsers, TestOrders, TestUserRequests, …)
-  mapper/             MapStruct mapper bridges (UserTestMapper, OrderTestMapper)
+  support/
+    base/               BaseTest, Connections, TestLogger, EnvironmentReadinessChecker
+    users/
+      dto/              UserDto, AddressDto, CarDto
+      entity/           UserEntity, AddressEntity, CarEntity
+      document/         UserProjectionDoc, AddressInfoDoc, VehicleInfoDoc
+      event/            UserCreatedEvent, UserUpdatedEvent, UserDeletedEvent, AddressInfo, VehicleInfo
+      factory/          TestUsers, TestAddresses, TestCars, TestUserRequests, TestUserEvents
+      mapper/           UserTestMapper
+    orders/
+      dto/              OrderDto, OrderItemDto, OrderStatus
+      entity/           OrderEntity, OrderItemEntity
+      document/         OrderProjectionDoc, OrderItemDoc
+      event/            OrderPlacedEvent, OrderCancelledEvent, OrderItemInfo
+      factory/          TestOrders, TestOrderItems, TestOrderRequests, TestOrderEvents
+      mapper/           OrderTestMapper
+    common/
+      dto/              ErrorDto, ValidationErrorDto, FieldViolationDto, LoginRequest, TokenDto
+      factory/          TestAuthRequests
   users/              Reference test suite (complete)
     endpoint/         Single-endpoint tests — happy path + validation
     flow/             Multi-step sequences within user-service
@@ -72,10 +84,10 @@ tests/src/test/java/org/mtodemo/tests/
 ```
 
 Key infrastructure files:
-- `Connections.java` — all host/port/credential constants
-- `BaseTest.java` — `@BeforeSuite` wires up all clients (HTTP, DB, Kafka×2, Mongo) and acquires JWT
-- `EnvironmentReadinessChecker.java` — three-stage startup gate (health → JWT → smoke probe)
-- `TestLogger.java` — TestNG listener, logs per-test pass/fail
+- `support/base/Connections.java` — all host/port/credential constants
+- `support/base/BaseTest.java` — `@BeforeSuite` wires up all clients (HTTP, DB, Kafka×2, Mongo) and acquires JWT
+- `support/base/EnvironmentReadinessChecker.java` — three-stage startup gate (health → JWT → smoke probe)
+- `support/base/TestLogger.java` — TestNG listener, logs per-test pass/fail
 
 ---
 
@@ -110,7 +122,7 @@ For negative auth tests, use `httpClient.withoutHeader("Authorization")` or `htt
 ## Conventions
 
 - **Factories** return `HttpCallRequest<T>` (request factories) or builder-based DTOs (data factories). Never construct `HttpCallRequest` inline in tests.
-- **Mappers** use static bridge methods (`UserTestMapper.toEntity()`, not `INSTANCE::toEntity`) — overloaded methods break type inference.
+- **Mappers** use static bridge methods (`UserTestMapper.toEntity()`, not `INSTANCE::toEntity`) — overloaded methods break type inference. Mappers live in `support/<domain>/mapper/`.
 - **allOf** for fan-out: when one HTTP response triggers DB + Kafka + Mongo assertions, use `Verify.allOf()` not sequential chains.
 - **Temporal tolerance**: Storage clients have default tolerances set in `BaseTest` via `withTemporalTolerance()` — `dbClient` (1 µs / `Duration.ofNanos(1000)`), `mongoClient` and Kafka clients (1 ms / `Duration.ofMillis(1)`). Use bare `findById()` and `consumeMatching()` in tests; reserve the explicit `Duration` overload for SLA-style assertions on service-generated timestamps.
 - Test DTOs duplicate service classes intentionally — tests must not depend on service internals.

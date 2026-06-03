@@ -2,10 +2,10 @@ package org.mtodemo.tests.users.endpoint;
 
 import org.modulartestorchestrator.base.Pipeline;
 import org.modulartestorchestrator.http.model.HttpCallResponse;
-import org.mtodemo.tests.dto.ErrorDto;
-import org.mtodemo.tests.factory.TestAuthRequests;
-import org.mtodemo.tests.factory.TestUserRequests;
-import org.mtodemo.tests.infrastructure.BaseTest;
+import org.mtodemo.tests.support.base.BaseTest;
+import org.mtodemo.tests.support.common.dto.ErrorDto;
+import org.mtodemo.tests.support.common.factory.TestAuthRequests;
+import org.mtodemo.tests.support.users.factory.TestUserRequests;
 import org.testng.annotations.Test;
 
 import java.util.Map;

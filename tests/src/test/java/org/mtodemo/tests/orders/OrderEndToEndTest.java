@@ -2,15 +2,15 @@ package org.mtodemo.tests.orders;
 
 import org.modulartestorchestrator.base.Pipeline;
 import org.modulartestorchestrator.base.checks.Verify;
-import org.mtodemo.tests.dto.OrderDto;
-import org.mtodemo.tests.dto.UserDto;
-import org.mtodemo.tests.event.OrderCancelledEvent;
-import org.mtodemo.tests.event.OrderPlacedEvent;
-import org.mtodemo.tests.factory.TestOrderRequests;
-import org.mtodemo.tests.factory.TestOrders;
-import org.mtodemo.tests.factory.TestUserRequests;
-import org.mtodemo.tests.infrastructure.BaseTest;
-import org.mtodemo.tests.mapper.OrderTestMapper;
+import org.mtodemo.tests.support.base.BaseTest;
+import org.mtodemo.tests.support.orders.dto.OrderDto;
+import org.mtodemo.tests.support.orders.event.OrderCancelledEvent;
+import org.mtodemo.tests.support.orders.event.OrderPlacedEvent;
+import org.mtodemo.tests.support.orders.factory.TestOrderRequests;
+import org.mtodemo.tests.support.orders.factory.TestOrders;
+import org.mtodemo.tests.support.orders.mapper.OrderTestMapper;
+import org.mtodemo.tests.support.users.dto.UserDto;
+import org.mtodemo.tests.support.users.factory.TestUserRequests;
 import org.testng.annotations.Test;
 
 public class OrderEndToEndTest extends BaseTest {

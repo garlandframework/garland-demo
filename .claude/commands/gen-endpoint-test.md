@@ -26,7 +26,7 @@ tests/src/test/java/org/mtodemo/tests/
 ```
 
 - Endpoint tests live in `org.mtodemo.tests.users.endpoint`
-- All test classes extend `BaseTest` (`org.mtodemo.tests.infrastructure.BaseTest`)
+- All test classes extend `BaseTest` (`org.mtodemo.tests.support.base.BaseTest`)
 - `@Listeners(TestLogger.class)` is inherited from `BaseTest` — do NOT add it again
 
 ## Clients (from BaseTest)
@@ -209,19 +209,19 @@ import org.modulartestorchestrator.base.checks.Verify;
 import org.modulartestorchestrator.http.model.HttpCallRequest;
 import org.modulartestorchestrator.http.model.HttpCallResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.mtodemo.tests.dto.ErrorDto;
-import org.mtodemo.tests.dto.FieldViolationDto;
-import org.mtodemo.tests.dto.UserDto;
-import org.mtodemo.tests.dto.ValidationErrorDto;
-import org.mtodemo.tests.dto.LoginRequest;
-import org.mtodemo.tests.dto.TokenDto;
-import org.mtodemo.tests.factory.TestAddresses;
-import org.mtodemo.tests.factory.TestAuthRequests;
-import org.mtodemo.tests.factory.TestCars;
-import org.mtodemo.tests.factory.TestUserRequests;
-import org.mtodemo.tests.factory.TestUsers;
-import org.mtodemo.tests.infrastructure.BaseTest;
-import org.mtodemo.tests.mapper.UserTestMapper;
+import org.mtodemo.tests.support.base.BaseTest;
+import org.mtodemo.tests.support.common.dto.ErrorDto;
+import org.mtodemo.tests.support.common.dto.FieldViolationDto;
+import org.mtodemo.tests.support.common.dto.LoginRequest;
+import org.mtodemo.tests.support.common.dto.TokenDto;
+import org.mtodemo.tests.support.common.dto.ValidationErrorDto;
+import org.mtodemo.tests.support.common.factory.TestAuthRequests;
+import org.mtodemo.tests.support.users.dto.UserDto;
+import org.mtodemo.tests.support.users.factory.TestAddresses;
+import org.mtodemo.tests.support.users.factory.TestCars;
+import org.mtodemo.tests.support.users.factory.TestUserRequests;
+import org.mtodemo.tests.support.users.factory.TestUsers;
+import org.mtodemo.tests.support.users.mapper.UserTestMapper;
 import org.testng.annotations.Test;
 import java.util.List;
 import java.util.Map;

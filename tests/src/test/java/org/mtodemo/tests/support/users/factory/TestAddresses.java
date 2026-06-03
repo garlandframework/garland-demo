@@ -1,0 +1,23 @@
+package org.mtodemo.tests.support.users.factory;
+
+import net.datafaker.Faker;
+import org.mtodemo.tests.support.users.dto.AddressDto;
+
+public final class TestAddresses {
+
+    private static final Faker faker = new Faker();
+
+    private TestAddresses() {}
+
+    public static AddressDto defaultAddress() {
+        return builder().build();
+    }
+
+    public static AddressDto.AddressDtoBuilder builder() {
+        return AddressDto.builder()
+                .street(faker.address().streetAddress())
+                .city(faker.address().city())
+                .country(faker.address().country())
+                .zipCode(faker.address().zipCode());
+    }
+}
