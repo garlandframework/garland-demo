@@ -20,7 +20,7 @@ public class GetAllUsersApiTest extends BaseTest {
                 .then(httpClient.makeCall(200, new TypeReference<List<UserDto>>() {}))
                 .execute();
 
-        assertThat(all).isNotNull();
+        assertThat(all).isEmpty();
     }
 
     @Test(description = "GET /api/users returns 200 and the list contains all previously created users")
