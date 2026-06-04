@@ -54,4 +54,12 @@ public final class TestUserRequests {
                 List.of(),
                 null);
     }
+
+    public static HttpCallRequest<Void> exportUser(UUID id) {
+        return new HttpCallRequest<>(
+                Connections.USER_SERVICE_URL + "/api/users/" + id + "/export",
+                "GET",
+                List.of(),
+                null);
+    }
 }

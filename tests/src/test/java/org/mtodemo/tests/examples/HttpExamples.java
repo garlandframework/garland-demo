@@ -4,16 +4,15 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import org.modulartestorchestrator.base.Pipeline;
 import org.modulartestorchestrator.base.retry.RetryConfig;
 import org.modulartestorchestrator.http.HttpTestClient;
-import org.modulartestorchestrator.http.model.FormBody;
 import org.modulartestorchestrator.http.model.Header;
 import org.modulartestorchestrator.http.model.HttpCallRequest;
 import org.modulartestorchestrator.http.model.HttpCallResponse;
-import org.modulartestorchestrator.http.model.MultipartBody;
 import org.mtodemo.tests.support.base.BaseTest;
 import org.mtodemo.tests.support.base.Connections;
 import org.mtodemo.tests.support.common.dto.ErrorDto;
 import org.mtodemo.tests.support.common.dto.TokenDto;
 import org.mtodemo.tests.support.common.factory.TestAuthRequests;
+import org.mtodemo.tests.support.common.factory.TestFileRequests;
 import org.mtodemo.tests.support.users.dto.UserDto;
 import org.mtodemo.tests.support.users.factory.TestUserRequests;
 import org.mtodemo.tests.support.users.factory.TestUsers;
@@ -291,15 +290,7 @@ public class HttpExamples extends BaseTest {
 
     @Test(description = "POST with form-encoded body — OAuth2 client_credentials token request")
     public void formBody_oauthTokenRequest() {
-        TokenDto token = Pipeline.given(
-                        new HttpCallRequest<>(
-                                Connections.USER_SERVICE_URL + "/oauth/token",
-                                "POST",
-                                List.of(),
-                                new FormBody()
-                                        .field("grant_type", "client_credentials")
-                                        .field("client_id", Connections.ADMIN_USERNAME)
-                                        .field("client_secret", Connections.ADMIN_PASSWORD)))
+        TokenDto token = Pipeline.given(TestAuthRequests.oauthToken())
                 .then(new HttpTestClient().makeCall(200, TokenDto.class))
                 .execute();
     }
@@ -317,14 +308,7 @@ public class HttpExamples extends BaseTest {
         Path diskFile = Files.createTempFile("photo-", ".jpg");
         Files.write(diskFile, "fake jpeg content".getBytes());
 
-        Pipeline.given(
-                        new HttpCallRequest<>(
-                                Connections.USER_SERVICE_URL + "/api/files",
-                                "POST",
-                                List.of(),
-                                new MultipartBody()
-                                        .field("description", "profile photo")
-                                        .file("file", diskFile, "image/jpeg")))
+        Pipeline.given(TestFileRequests.uploadFromDisk("profile photo", diskFile, "image/jpeg"))
                 .then(httpClient.makeCall(201, Void.class))
                 .execute();
     }
@@ -340,14 +324,7 @@ public class HttpExamples extends BaseTest {
     public void multipartBody_inMemoryBytes() throws Exception {
         byte[] data = "hello world".getBytes();
 
-        Pipeline.given(
-                        new HttpCallRequest<>(
-                                Connections.USER_SERVICE_URL + "/api/files",
-                                "POST",
-                                List.of(),
-                                new MultipartBody()
-                                        .field("description", "greeting")
-                                        .file("file", data, "hello.txt", "text/plain")))
+        Pipeline.given(TestFileRequests.uploadFromBytes("greeting", data, "hello.txt", "text/plain"))
                 .then(httpClient.makeCall(201, Void.class))
                 .execute();
     }
@@ -541,12 +518,7 @@ public class HttpExamples extends BaseTest {
 
         Path destination = Path.of(System.getProperty("java.io.tmpdir"), "user-" + created.getUuid() + ".csv");
 
-        Path saved = Pipeline.given(
-                        new HttpCallRequest<>(
-                                Connections.USER_SERVICE_URL + "/api/users/" + created.getUuid() + "/export",
-                                "GET",
-                                List.of(),
-                                null))
+        Path saved = Pipeline.given(TestUserRequests.exportUser(created.getUuid()))
                 .then(httpClient.downloadFile(200, destination))
                 .execute();
 
