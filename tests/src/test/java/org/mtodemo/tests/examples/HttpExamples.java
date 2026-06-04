@@ -5,8 +5,9 @@ import org.modulartestorchestrator.base.Pipeline;
 import org.modulartestorchestrator.base.retry.RetryConfig;
 import org.modulartestorchestrator.http.HttpTestClient;
 import org.modulartestorchestrator.http.model.FormBody;
-import org.modulartestorchestrator.http.model.HttpCallResponse;
+import org.modulartestorchestrator.http.model.Header;
 import org.modulartestorchestrator.http.model.HttpCallRequest;
+import org.modulartestorchestrator.http.model.HttpCallResponse;
 import org.modulartestorchestrator.http.model.MultipartBody;
 import org.mtodemo.tests.support.base.BaseTest;
 import org.mtodemo.tests.support.base.Connections;
@@ -18,6 +19,7 @@ import org.mtodemo.tests.support.users.factory.TestUserRequests;
 import org.mtodemo.tests.support.users.factory.TestUsers;
 import org.testng.annotations.Test;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.List;
@@ -33,6 +35,10 @@ import java.util.UUID;
  * Run one:        mvn test -pl tests -Dtest=HttpExamples#makeCall_statusOnly
  */
 public class HttpExamples extends BaseTest {
+
+    // =========================================================================
+    // makeCall
+    // =========================================================================
 
     // -------------------------------------------------------------------------
     // 1. makeCall — assert status, return deserialized body
@@ -52,7 +58,7 @@ public class HttpExamples extends BaseTest {
     }
 
     // -------------------------------------------------------------------------
-    // 2. makeCall — assert status + body shape (matchingNonNull)
+    // 2. makeCall — assert status + body shape
     //
     //    HttpCallResponse describes the expected response. Null fields in the
     //    expected DTO are ignored — only non-null fields are compared.
@@ -104,7 +110,6 @@ public class HttpExamples extends BaseTest {
 
     @Test(description = "GET /api/users returns 200 and a typed list of users")
     public void makeCall_genericListResponse() {
-        // create a user so the list is non-empty
         Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .then(trackUser())
@@ -131,6 +136,10 @@ public class HttpExamples extends BaseTest {
                 .execute();
     }
 
+    // =========================================================================
+    // pollingCall
+    // =========================================================================
+
     // -------------------------------------------------------------------------
     // 6. pollingCall — eventually-consistent endpoints
     //
@@ -151,15 +160,17 @@ public class HttpExamples extends BaseTest {
                 .name(created.getName())
                 .build();
 
-        RetryConfig retry = RetryConfig.of(5, Duration.ofMillis(500));
-
         Pipeline.given(TestUserRequests.getUser(created.getUuid()))
-                .then(httpClient.pollingCall(200, expected, retry))
+                .then(httpClient.pollingCall(200, expected, RetryConfig.of(5, Duration.ofMillis(500))))
                 .execute();
     }
 
+    // =========================================================================
+    // Auth
+    // =========================================================================
+
     // -------------------------------------------------------------------------
-    // 7. Auth — withoutHeader (negative test)
+    // 7. withoutHeader — remove a header for a single call (negative auth test)
     //
     //    The suite-wide httpClient already has Authorization set in @BeforeSuite.
     //    withoutHeader returns a new client with the header removed — the original
@@ -174,7 +185,7 @@ public class HttpExamples extends BaseTest {
     }
 
     // -------------------------------------------------------------------------
-    // 8. Auth — withBearer (suite-wide token override)
+    // 8. withBearer — replace the suite-wide token for a single call
     //
     //    withBearer returns a new client with a different Authorization header.
     //    Use when a specific test needs a different token than the suite default —
@@ -189,7 +200,7 @@ public class HttpExamples extends BaseTest {
     }
 
     // -------------------------------------------------------------------------
-    // 9. Auth — storeBearer (token fetched inside the pipeline)
+    // 9. storeBearer — token fetched inside the pipeline
     //
     //    Use when the token is obtained mid-pipeline rather than beforehand.
     //    storeBearer stores the token in PipelineContext; every subsequent
@@ -207,8 +218,7 @@ public class HttpExamples extends BaseTest {
                 .execute();
 
         // any subsequent makeCall on 'unauthenticated' in the same pipeline
-        // would now carry Authorization: Bearer <token> from context.
-        // In practice you'd continue the pipeline here rather than execute() early.
+        // would carry Authorization: Bearer <token> from context automatically.
         Pipeline.given(TestUserRequests.createUser())
                 .then(unauthenticated.withBearer(tokenDto.token()).makeCall(201, UserDto.class))
                 .then(trackUser())
@@ -220,11 +230,11 @@ public class HttpExamples extends BaseTest {
     // =========================================================================
 
     // -------------------------------------------------------------------------
-    // 10. withQueryParam — single parameter (adversarial tests)
+    // 10. withQueryParam — single parameter
     //
-    //     Use in tests to inject one valid, invalid, or malformed value on top
-    //     of the default request from the factory. The parameter is percent-encoded
-    //     and appended to the URL at call time — the factory stays clean.
+    //     Appends one percent-encoded parameter to the URL at call time.
+    //     The factory method stays clean; tests inject valid, invalid, or
+    //     malformed values on top without touching the factory.
     // -------------------------------------------------------------------------
 
     @Test(description = "GET /api/users with a single query parameter")
@@ -236,7 +246,7 @@ public class HttpExamples extends BaseTest {
     }
 
     // -------------------------------------------------------------------------
-    // 11. withQueryParams — multiple parameters (factory methods / happy path)
+    // 11. withQueryParams — multiple parameters at once
     //
     //     Use in factory methods when a request naturally carries several
     //     parameters. Cleaner than chaining withQueryParam for each one.
@@ -274,13 +284,11 @@ public class HttpExamples extends BaseTest {
     // -------------------------------------------------------------------------
     // 13. FormBody — application/x-www-form-urlencoded
     //
-    //     Pass a FormBody as the dto. HttpSteps detects it and:
-    //       - encodes all fields as percent-encoded key=value pairs
-    //       - sets Content-Type: application/x-www-form-urlencoded automatically
+    //     Pass a FormBody as the dto. HttpSteps detects it and encodes all fields
+    //     as percent-encoded key=value pairs. Content-Type is set automatically.
     //     Typical use: OAuth2 token endpoints, legacy form APIs.
     //
     //     Disabled: this demo project has no form-encoded endpoint.
-    //     Remove @Test(enabled = false) and point at a real endpoint to run it.
     // -------------------------------------------------------------------------
 
     @Test(enabled = false, description = "POST with form-encoded body — OAuth2 token endpoint pattern")
@@ -299,19 +307,16 @@ public class HttpExamples extends BaseTest {
     }
 
     // -------------------------------------------------------------------------
-    // 14. MultipartBody — multipart/form-data
+    // 14. MultipartBody — multipart/form-data, file from disk
     //
-    //     Pass a MultipartBody as the dto. HttpSteps detects it and:
-    //       - builds a multipart byte stream with a random boundary
-    //       - sets Content-Type: multipart/form-data; boundary=... automatically
-    //     Supports text fields (.field) and file parts from Path or byte[].
+    //     Pass a MultipartBody as the dto. HttpSteps builds the multipart byte
+    //     stream with a random boundary. Content-Type is set automatically.
     //     Typical use: file upload endpoints.
     //
     //     Disabled: this demo project has no multipart endpoint.
-    //     Remove @Test(enabled = false) and point at a real endpoint to run it.
     // -------------------------------------------------------------------------
 
-    @Test(enabled = false, description = "POST multipart/form-data with a text field and a file — upload endpoint pattern")
+    @Test(enabled = false, description = "POST multipart/form-data with a text field and a file from disk")
     public void multipartBody_fileUpload() throws Exception {
         Pipeline.given(
                         new HttpCallRequest<>(
@@ -324,6 +329,15 @@ public class HttpExamples extends BaseTest {
                 .then(httpClient.makeCall(201, Void.class))
                 .execute();
     }
+
+    // -------------------------------------------------------------------------
+    // 15. MultipartBody — multipart/form-data, file from in-memory bytes
+    //
+    //     Use when the file content is already in memory (generated in the test,
+    //     read from a resource, etc.) — no file on disk required.
+    //
+    //     Disabled: this demo project has no multipart endpoint.
+    // -------------------------------------------------------------------------
 
     @Test(enabled = false, description = "POST multipart/form-data with in-memory bytes — no file on disk needed")
     public void multipartBody_inMemoryBytes() throws Exception {
@@ -349,11 +363,9 @@ public class HttpExamples extends BaseTest {
     // 16. Raw JSON string body
     //
     //     Pass a String as dto — HttpSteps skips Jackson serialization and sends
-    //     the string as-is. Content-Type defaults to application/json unless
-    //     a Content-Type header is added to the request.
-    //
-    //     Use when: body comes from a fixture file, a captured replay, or is built
-    //     by string interpolation in a parameterized test.
+    //     the string as-is. Content-Type defaults to application/json.
+    //     Use when the body comes from a fixture file, a captured replay, or is
+    //     built by string interpolation in a parameterized test.
     // -------------------------------------------------------------------------
 
     @Test(description = "POST with a pre-serialized JSON string body — skips Jackson")
@@ -374,9 +386,8 @@ public class HttpExamples extends BaseTest {
     // -------------------------------------------------------------------------
     // 17. Raw non-JSON string body (XML, plain text, etc.)
     //
-    //     Same as above, but with a Content-Type header added to the request to
-    //     override the application/json default. Use for any content type where
-    //     the body is already in its final string form.
+    //     Same as above, but with a Content-Type header to override the default
+    //     application/json. Use for any content type that is already a string.
     //
     //     Disabled: this demo project has no XML endpoint.
     // -------------------------------------------------------------------------
@@ -389,7 +400,7 @@ public class HttpExamples extends BaseTest {
                         new HttpCallRequest<>(
                                 Connections.USER_SERVICE_URL + "/api/users",
                                 "POST",
-                                List.of(new org.modulartestorchestrator.http.model.Header("Content-Type", "application/xml")),
+                                List.of(new Header("Content-Type", "application/xml")),
                                 xml))
                 .then(httpClient.makeCall(201, UserDto.class))
                 .then(trackUser())
@@ -406,14 +417,11 @@ public class HttpExamples extends BaseTest {
     //     withBaseUrl returns a new client that prepends the host to any request
     //     URL starting with '/'. Absolute URLs are used as-is.
     //     All other client settings (headers, auth, retry) are carried over.
-    //
-    //     Use when: you want request factories to use relative paths so the host
-    //     can be changed in one place (e.g. switching environments).
+    //     Use when you want to change the host in one place (e.g. environments).
     // -------------------------------------------------------------------------
 
     @Test(description = "Client with base URL — request uses a relative path, host prepended at call time")
     public void baseUrl_relativePathRequest() {
-        // httpClient already has auth from @BeforeSuite; withBaseUrl carries it over
         HttpTestClient client = httpClient.withBaseUrl(Connections.USER_SERVICE_URL);
 
         UserDto created = Pipeline.given(
@@ -424,106 +432,14 @@ public class HttpExamples extends BaseTest {
     }
 
     // -------------------------------------------------------------------------
-    // 19. withBaseUrl + withBearer — chaining preserves base URL
+    // 19. withBaseUrl + withBearer — chaining preserves all settings
     //
-    //     All with* methods carry the base URL forward. Here we build a fresh
-    //     client from scratch: login to get a token, then configure both base URL
-    //     and bearer auth. Useful when tests need a non-default identity.
+    //     All with* methods carry the base URL forward. Here a fresh client is
+    //     built from scratch: login to get a token, then configure base URL and
+    //     bearer auth. Demonstrates that chaining order does not matter.
     // -------------------------------------------------------------------------
 
-    // =========================================================================
-    // Timeout
-    // =========================================================================
-
-    // -------------------------------------------------------------------------
-    // 20. withTimeout — per-client request timeout
-    //
-    //     Without a timeout a hanging server blocks the test thread forever.
-    //     withTimeout applies HttpRequest.Builder.timeout() to every call on
-    //     this client. If the server does not respond in time,
-    //     HttpTimeoutException is thrown (wrapped in RuntimeException).
-    //
-    //     All other with* methods carry the timeout forward.
-    // -------------------------------------------------------------------------
-
-    @Test(description = "Client with a 10-second timeout — hangs fail fast instead of blocking forever")
-    public void timeout_callCompletesWithinLimit() {
-        HttpTestClient client = httpClient.withTimeout(Duration.ofSeconds(10));
-
-        UserDto created = Pipeline.given(TestUserRequests.createUser())
-                .then(client.makeCall(201, UserDto.class))
-                .then(trackUser())
-                .execute();
-    }
-
-    // =========================================================================
-    // Cookies
-    // =========================================================================
-
-    // -------------------------------------------------------------------------
-    // 22. withCookie — convenience over withHeader("Cookie", ...)
-    //
-    //     Formats the Cookie header automatically. Use for session-cookie auth
-    //     schemes or when the service under test reads cookies directly.
-    //     Multiple cookies: chain withCookie calls — each adds a separate
-    //     Cookie header (the server sees both).
-    //
-    //     Disabled: this demo project uses Bearer auth, not cookies.
-    // -------------------------------------------------------------------------
-
-    // =========================================================================
-    // File download
-    // =========================================================================
-
-    // -------------------------------------------------------------------------
-    // 23. downloadFile — save binary response to disk
-    //
-    //     Uses BodyHandlers.ofByteArray() so binary content is not corrupted
-    //     by charset conversion. Parent directories are created automatically.
-    //     Returns the Path for chaining (e.g. assert file size, read content).
-    //
-    //     Disabled: this demo project has no file download endpoint.
-    // -------------------------------------------------------------------------
-
-    @Test(enabled = false, description = "GET file download endpoint — response saved to disk as-is")
-    public void downloadFile_savesToDisk() throws Exception {
-        Path destination = Path.of(System.getProperty("java.io.tmpdir"), "report.pdf");
-
-        Path saved = Pipeline.given(
-                        new HttpCallRequest<>(
-                                Connections.USER_SERVICE_URL + "/api/reports/123/download",
-                                "GET",
-                                List.of(),
-                                null))
-                .then(httpClient.downloadFile(200, destination))
-                .execute();
-
-        // saved == destination; read back or assert size if needed
-        assert java.nio.file.Files.size(saved) > 0;
-    }
-
-    @Test(enabled = false, description = "Request with a session cookie — cookie-auth endpoint pattern")
-    public void cookie_sessionAuth() {
-        Pipeline.given(TestUserRequests.createUser())
-                .then(httpClient.withCookie("session", "abc123").makeCall(201, UserDto.class))
-                .then(trackUser())
-                .execute();
-    }
-
-    @Test(description = "withTimeout and withBaseUrl can be chained — all settings are preserved")
-    public void timeout_chainedWithBaseUrl() {
-        HttpTestClient client = httpClient
-                .withBaseUrl(Connections.USER_SERVICE_URL)
-                .withTimeout(Duration.ofSeconds(10));
-
-        UserDto created = Pipeline.given(
-                        new HttpCallRequest<>("/api/users", "POST", List.of(), TestUsers.defaultUser()))
-                .then(client.makeCall(201, UserDto.class))
-                .then(trackUser())
-                .execute();
-    }
-
-    @Test(description = "withBaseUrl and withBearer chain — base URL is preserved across mutations")
+    @Test(description = "withBaseUrl and withBearer chain — all settings are preserved across mutations")
     public void baseUrl_chainedWithAuth() {
         TokenDto tokenDto = Pipeline.given(TestAuthRequests.login())
                 .then(new HttpTestClient().makeCall(200, TokenDto.class))
@@ -538,5 +454,101 @@ public class HttpExamples extends BaseTest {
                 .then(client.makeCall(201, UserDto.class))
                 .then(trackUser())
                 .execute();
+    }
+
+    // =========================================================================
+    // Timeout
+    // =========================================================================
+
+    // -------------------------------------------------------------------------
+    // 20. withTimeout — per-client request timeout
+    //
+    //     Without a timeout a hanging server blocks the test thread forever.
+    //     withTimeout applies HttpRequest.Builder.timeout() to every call on
+    //     this client. If the server does not respond in time,
+    //     HttpTimeoutException is thrown (wrapped in RuntimeException).
+    // -------------------------------------------------------------------------
+
+    @Test(description = "Client with a 10-second timeout — hangs fail fast instead of blocking forever")
+    public void timeout_callCompletesWithinLimit() {
+        HttpTestClient client = httpClient.withTimeout(Duration.ofSeconds(10));
+
+        UserDto created = Pipeline.given(TestUserRequests.createUser())
+                .then(client.makeCall(201, UserDto.class))
+                .then(trackUser())
+                .execute();
+    }
+
+    // -------------------------------------------------------------------------
+    // 21. withTimeout + withBaseUrl — all with* settings chain together
+    //
+    //     withTimeout carries forward through all other with* mutations.
+    //     Combine with withBaseUrl, withBearer, etc. in any order.
+    // -------------------------------------------------------------------------
+
+    @Test(description = "withTimeout and withBaseUrl chained — both settings applied to every call")
+    public void timeout_chainedWithBaseUrl() {
+        HttpTestClient client = httpClient
+                .withBaseUrl(Connections.USER_SERVICE_URL)
+                .withTimeout(Duration.ofSeconds(10));
+
+        UserDto created = Pipeline.given(
+                        new HttpCallRequest<>("/api/users", "POST", List.of(), TestUsers.defaultUser()))
+                .then(client.makeCall(201, UserDto.class))
+                .then(trackUser())
+                .execute();
+    }
+
+    // =========================================================================
+    // Cookies
+    // =========================================================================
+
+    // -------------------------------------------------------------------------
+    // 22. withCookie — convenience over withHeader("Cookie", ...)
+    //
+    //     Formats the Cookie header as name=value automatically. Use for
+    //     session-cookie auth schemes or services that read cookies directly.
+    //     Chain multiple withCookie calls to send more than one cookie.
+    //
+    //     Disabled: this demo project uses Bearer auth, not cookies.
+    // -------------------------------------------------------------------------
+
+    @Test(enabled = false, description = "Request with a session cookie — cookie-auth endpoint pattern")
+    public void cookie_sessionAuth() {
+        Pipeline.given(TestUserRequests.createUser())
+                .then(httpClient.withCookie("session", "abc123").makeCall(201, UserDto.class))
+                .then(trackUser())
+                .execute();
+    }
+
+    // =========================================================================
+    // File download
+    // =========================================================================
+
+    // -------------------------------------------------------------------------
+    // 23. downloadFile — save binary response to disk
+    //
+    //     Uses BodyHandlers.ofByteArray() so binary content (PDF, image, ZIP)
+    //     is never corrupted by charset conversion. Parent directories are
+    //     created automatically. Returns the Path for further assertions.
+    //
+    //     Disabled: this demo project has no file download endpoint.
+    // -------------------------------------------------------------------------
+
+    @Test(enabled = false, description = "GET file download endpoint — binary response saved to disk as-is")
+    public void downloadFile_savesToDisk() throws Exception {
+        Path destination = Path.of(System.getProperty("java.io.tmpdir"), "report.pdf");
+
+        Path saved = Pipeline.given(
+                        new HttpCallRequest<>(
+                                Connections.USER_SERVICE_URL + "/api/reports/123/download",
+                                "GET",
+                                List.of(),
+                                null))
+                .then(httpClient.downloadFile(200, destination))
+                .execute();
+
+        // saved == destination; read back or assert file size if needed
+        assert Files.size(saved) > 0;
     }
 }
