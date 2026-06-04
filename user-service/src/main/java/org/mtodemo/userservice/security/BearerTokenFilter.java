@@ -19,7 +19,7 @@ public class BearerTokenFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getServletPath();
-        return path.startsWith("/api/auth") || path.startsWith("/actuator");
+        return path.startsWith("/api/auth") || path.startsWith("/oauth") || path.startsWith("/actuator");
     }
 
     @Override

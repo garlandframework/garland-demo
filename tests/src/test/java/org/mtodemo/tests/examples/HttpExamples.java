@@ -287,22 +287,20 @@ public class HttpExamples extends BaseTest {
     //     Pass a FormBody as the dto. HttpSteps detects it and encodes all fields
     //     as percent-encoded key=value pairs. Content-Type is set automatically.
     //     Typical use: OAuth2 token endpoints, legacy form APIs.
-    //
-    //     Disabled: this demo project has no form-encoded endpoint.
     // -------------------------------------------------------------------------
 
-    @Test(enabled = false, description = "POST with form-encoded body — OAuth2 token endpoint pattern")
+    @Test(description = "POST with form-encoded body — OAuth2 client_credentials token request")
     public void formBody_oauthTokenRequest() {
         TokenDto token = Pipeline.given(
                         new HttpCallRequest<>(
-                                "http://localhost:8080/oauth/token",
+                                Connections.USER_SERVICE_URL + "/oauth/token",
                                 "POST",
                                 List.of(),
                                 new FormBody()
                                         .field("grant_type", "client_credentials")
-                                        .field("client_id", "my-client")
-                                        .field("client_secret", "secret")))
-                .then(httpClient.makeCall(200, TokenDto.class))
+                                        .field("client_id", Connections.ADMIN_USERNAME)
+                                        .field("client_secret", Connections.ADMIN_PASSWORD)))
+                .then(new HttpTestClient().makeCall(200, TokenDto.class))
                 .execute();
     }
 
