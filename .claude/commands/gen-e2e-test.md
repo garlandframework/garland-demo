@@ -210,7 +210,16 @@ This asserts the timestamp is present and within the SLA window — if processin
 TestUserRequests.createUser()
 TestUserRequests.createUser(UserDto dto)
 TestUserRequests.updateUser(UUID id, UserDto dto)
+TestUserRequests.getUser(UUID id)
+TestUserRequests.getAllUsers()
 TestUserRequests.deleteUser(UUID id)
+```
+
+Query parameters (when an endpoint accepts them) are added via `withQueryParam` / `withQueryParams` — never string-concat into the URL:
+
+```java
+TestUserRequests.getAllUsers().withQueryParam("page", "0")
+TestUserRequests.getAllUsers().withQueryParams(Map.of("page", "0", "size", "10"))
 ```
 
 ## Test data factories

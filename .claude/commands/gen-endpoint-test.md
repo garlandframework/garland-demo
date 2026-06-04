@@ -258,6 +258,47 @@ UserDto user = TestUsers.builder()
         .build();
 ```
 
+## Query parameter constraints
+
+When an endpoint accepts query parameters, document them here with their constraints and use `withQueryParam` / `withQueryParams` in tests — never string-concat params into the URL.
+
+```
+| Param | Type | Constraint | Invalid value | Malformed value |
+|-------|------|------------|---------------|-----------------|
+<!-- from analysis: fill in when endpoint has query params -->
+```
+
+Test patterns:
+
+```java
+// happy path — single param
+Pipeline.given(TestUserRequests.getUsers().withQueryParam("page", "0"))
+        .then(httpClient.makeCall(200, new TypeReference<List<UserDto>>() {}))
+        .execute();
+
+// happy path — multiple params (use withQueryParams)
+Pipeline.given(TestUserRequests.getUsers().withQueryParams(Map.of("page", "0", "size", "10")))
+        .then(httpClient.makeCall(200, new TypeReference<List<UserDto>>() {}))
+        .execute();
+
+// invalid value
+Pipeline.given(TestUserRequests.getUsers().withQueryParam("page", "-1"))
+        .then(httpClient.makeCall(400, ValidationErrorDto.class))
+        .then(Verify.matching(ValidationErrorDto.forField("page")))
+        .execute();
+
+// malformed (cannot be parsed as expected type)
+Pipeline.given(TestUserRequests.getUsers().withQueryParam("page", "abc"))
+        .then(httpClient.makeCall(400, ErrorDto.class))
+        .execute();
+
+// too-long string param
+Pipeline.given(TestUserRequests.searchUsers().withQueryParam("name", "a".repeat(256)))
+        .then(httpClient.makeCall(400, ValidationErrorDto.class))
+        .then(Verify.matching(ValidationErrorDto.forField("name")))
+        .execute();
+```
+
 ## @BeforeMethod for update/delete test classes
 
 When every test in a class requires a pre-existing entity (e.g. a PUT or DELETE endpoint test), declare the entity as an instance field and create it once per test in `@BeforeMethod`. Do not repeat the setup pipeline inside each test method.

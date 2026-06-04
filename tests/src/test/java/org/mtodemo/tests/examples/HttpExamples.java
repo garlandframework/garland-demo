@@ -209,4 +209,56 @@ public class HttpExamples extends BaseTest {
                 .then(trackUser())
                 .execute();
     }
+
+    // =========================================================================
+    // Query parameters
+    // =========================================================================
+
+    // -------------------------------------------------------------------------
+    // 10. withQueryParam — single parameter (adversarial tests)
+    //
+    //     Use in tests to inject one valid, invalid, or malformed value on top
+    //     of the default request from the factory. The parameter is percent-encoded
+    //     and appended to the URL at call time — the factory stays clean.
+    // -------------------------------------------------------------------------
+
+    @Test(description = "GET /api/users with a single query parameter")
+    public void queryParam_single() {
+        List<UserDto> users = Pipeline.given(
+                        TestUserRequests.getAllUsers().withQueryParam("page", "0"))
+                .then(httpClient.makeCall(200, new TypeReference<List<UserDto>>() {}))
+                .execute();
+    }
+
+    // -------------------------------------------------------------------------
+    // 11. withQueryParams — multiple parameters (factory methods / happy path)
+    //
+    //     Use in factory methods when a request naturally carries several
+    //     parameters. Cleaner than chaining withQueryParam for each one.
+    //     All entries are merged; existing keys are replaced.
+    // -------------------------------------------------------------------------
+
+    @Test(description = "GET /api/users with multiple query parameters at once")
+    public void queryParam_multiple() {
+        List<UserDto> users = Pipeline.given(
+                        TestUserRequests.getAllUsers()
+                                .withQueryParams(Map.of("page", "0", "size", "10")))
+                .then(httpClient.makeCall(200, new TypeReference<List<UserDto>>() {}))
+                .execute();
+    }
+
+    // -------------------------------------------------------------------------
+    // 12. withQueryParam — adversarial: invalid value
+    //
+    //     The factory produces the base request; the test overrides one param
+    //     with a bad value. The server rejects it and returns 400.
+    //     Same pattern for malformed ("abc" instead of a number) or too-long values.
+    // -------------------------------------------------------------------------
+
+    @Test(description = "GET /api/users with invalid page param returns 400")
+    public void queryParam_invalidValue() {
+        Pipeline.given(TestUserRequests.getAllUsers().withQueryParam("page", "-1"))
+                .then(httpClient.makeCall(400, ErrorDto.class))
+                .execute();
+    }
 }
