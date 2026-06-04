@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import org.springframework.data.domain.PageRequest;
+
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -42,8 +44,8 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public List<UserDto> findAll() {
-        return userRepository.findAll().stream()
+    public List<UserDto> findAll(int page, int size) {
+        return userRepository.findAll(PageRequest.of(page, size)).stream()
                 .map(userMapper::toDto)
                 .toList();
     }
