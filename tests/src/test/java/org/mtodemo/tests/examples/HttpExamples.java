@@ -431,6 +431,44 @@ public class HttpExamples extends BaseTest {
     //     and bearer auth. Useful when tests need a non-default identity.
     // -------------------------------------------------------------------------
 
+    // =========================================================================
+    // Timeout
+    // =========================================================================
+
+    // -------------------------------------------------------------------------
+    // 20. withTimeout — per-client request timeout
+    //
+    //     Without a timeout a hanging server blocks the test thread forever.
+    //     withTimeout applies HttpRequest.Builder.timeout() to every call on
+    //     this client. If the server does not respond in time,
+    //     HttpTimeoutException is thrown (wrapped in RuntimeException).
+    //
+    //     All other with* methods carry the timeout forward.
+    // -------------------------------------------------------------------------
+
+    @Test(description = "Client with a 10-second timeout — hangs fail fast instead of blocking forever")
+    public void timeout_callCompletesWithinLimit() {
+        HttpTestClient client = httpClient.withTimeout(Duration.ofSeconds(10));
+
+        UserDto created = Pipeline.given(TestUserRequests.createUser())
+                .then(client.makeCall(201, UserDto.class))
+                .then(trackUser())
+                .execute();
+    }
+
+    @Test(description = "withTimeout and withBaseUrl can be chained — all settings are preserved")
+    public void timeout_chainedWithBaseUrl() {
+        HttpTestClient client = httpClient
+                .withBaseUrl(Connections.USER_SERVICE_URL)
+                .withTimeout(Duration.ofSeconds(10));
+
+        UserDto created = Pipeline.given(
+                        new HttpCallRequest<>("/api/users", "POST", List.of(), TestUsers.defaultUser()))
+                .then(client.makeCall(201, UserDto.class))
+                .then(trackUser())
+                .execute();
+    }
+
     @Test(description = "withBaseUrl and withBearer chain — base URL is preserved across mutations")
     public void baseUrl_chainedWithAuth() {
         TokenDto tokenDto = Pipeline.given(TestAuthRequests.login())
