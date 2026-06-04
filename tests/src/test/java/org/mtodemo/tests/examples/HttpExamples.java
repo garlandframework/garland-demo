@@ -456,6 +456,29 @@ public class HttpExamples extends BaseTest {
                 .execute();
     }
 
+    // =========================================================================
+    // Cookies
+    // =========================================================================
+
+    // -------------------------------------------------------------------------
+    // 22. withCookie — convenience over withHeader("Cookie", ...)
+    //
+    //     Formats the Cookie header automatically. Use for session-cookie auth
+    //     schemes or when the service under test reads cookies directly.
+    //     Multiple cookies: chain withCookie calls — each adds a separate
+    //     Cookie header (the server sees both).
+    //
+    //     Disabled: this demo project uses Bearer auth, not cookies.
+    // -------------------------------------------------------------------------
+
+    @Test(enabled = false, description = "Request with a session cookie — cookie-auth endpoint pattern")
+    public void cookie_sessionAuth() {
+        Pipeline.given(TestUserRequests.createUser())
+                .then(httpClient.withCookie("session", "abc123").makeCall(201, UserDto.class))
+                .then(trackUser())
+                .execute();
+    }
+
     @Test(description = "withTimeout and withBaseUrl can be chained — all settings are preserved")
     public void timeout_chainedWithBaseUrl() {
         HttpTestClient client = httpClient
