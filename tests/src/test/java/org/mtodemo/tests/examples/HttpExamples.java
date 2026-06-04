@@ -312,20 +312,21 @@ public class HttpExamples extends BaseTest {
     //     Pass a MultipartBody as the dto. HttpSteps builds the multipart byte
     //     stream with a random boundary. Content-Type is set automatically.
     //     Typical use: file upload endpoints.
-    //
-    //     Disabled: this demo project has no multipart endpoint.
     // -------------------------------------------------------------------------
 
-    @Test(enabled = false, description = "POST multipart/form-data with a text field and a file from disk")
+    @Test(description = "POST multipart/form-data with a text field and a file from disk")
     public void multipartBody_fileUpload() throws Exception {
+        Path diskFile = Files.createTempFile("photo-", ".jpg");
+        Files.write(diskFile, "fake jpeg content".getBytes());
+
         Pipeline.given(
                         new HttpCallRequest<>(
-                                "http://localhost:8080/api/files",
+                                Connections.USER_SERVICE_URL + "/api/files",
                                 "POST",
                                 List.of(),
                                 new MultipartBody()
                                         .field("description", "profile photo")
-                                        .file("photo", Path.of("/tmp/photo.jpg"), "image/jpeg")))
+                                        .file("file", diskFile, "image/jpeg")))
                 .then(httpClient.makeCall(201, Void.class))
                 .execute();
     }
@@ -335,22 +336,20 @@ public class HttpExamples extends BaseTest {
     //
     //     Use when the file content is already in memory (generated in the test,
     //     read from a resource, etc.) — no file on disk required.
-    //
-    //     Disabled: this demo project has no multipart endpoint.
     // -------------------------------------------------------------------------
 
-    @Test(enabled = false, description = "POST multipart/form-data with in-memory bytes — no file on disk needed")
+    @Test(description = "POST multipart/form-data with in-memory bytes — no file on disk needed")
     public void multipartBody_inMemoryBytes() throws Exception {
         byte[] data = "hello world".getBytes();
 
         Pipeline.given(
                         new HttpCallRequest<>(
-                                "http://localhost:8080/api/files",
+                                Connections.USER_SERVICE_URL + "/api/files",
                                 "POST",
                                 List.of(),
                                 new MultipartBody()
-                                        .field("label", "greeting")
-                                        .file("content", data, "hello.txt", "text/plain")))
+                                        .field("description", "greeting")
+                                        .file("file", data, "hello.txt", "text/plain")))
                 .then(httpClient.makeCall(201, Void.class))
                 .execute();
     }
