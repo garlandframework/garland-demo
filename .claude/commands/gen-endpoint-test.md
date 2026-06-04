@@ -59,7 +59,7 @@ Pipeline.given(TestOrderRequests.placeOrder(
 
 ## Auth tests
 
-Negative auth tests live in `AuthTest` (same package). Use `httpClient.withoutHeader` / `withBearer` inline — never reassign the shared `httpClient`:
+Negative auth tests live in `AuthTest` (same package). Use `httpClient.withoutHeader` / `withBearer` / `withBaseUrl` inline — never reassign the shared `httpClient`:
 
 ```java
 // No token → 401

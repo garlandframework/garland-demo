@@ -395,4 +395,56 @@ public class HttpExamples extends BaseTest {
                 .then(trackUser())
                 .execute();
     }
+
+    // =========================================================================
+    // Base URL
+    // =========================================================================
+
+    // -------------------------------------------------------------------------
+    // 18. withBaseUrl — relative-path request factories
+    //
+    //     withBaseUrl returns a new client that prepends the host to any request
+    //     URL starting with '/'. Absolute URLs are used as-is.
+    //     All other client settings (headers, auth, retry) are carried over.
+    //
+    //     Use when: you want request factories to use relative paths so the host
+    //     can be changed in one place (e.g. switching environments).
+    // -------------------------------------------------------------------------
+
+    @Test(description = "Client with base URL — request uses a relative path, host prepended at call time")
+    public void baseUrl_relativePathRequest() {
+        // httpClient already has auth from @BeforeSuite; withBaseUrl carries it over
+        HttpTestClient client = httpClient.withBaseUrl(Connections.USER_SERVICE_URL);
+
+        UserDto created = Pipeline.given(
+                        new HttpCallRequest<>("/api/users", "POST", List.of(), TestUsers.defaultUser()))
+                .then(client.makeCall(201, UserDto.class))
+                .then(trackUser())
+                .execute();
+    }
+
+    // -------------------------------------------------------------------------
+    // 19. withBaseUrl + withBearer — chaining preserves base URL
+    //
+    //     All with* methods carry the base URL forward. Here we build a fresh
+    //     client from scratch: login to get a token, then configure both base URL
+    //     and bearer auth. Useful when tests need a non-default identity.
+    // -------------------------------------------------------------------------
+
+    @Test(description = "withBaseUrl and withBearer chain — base URL is preserved across mutations")
+    public void baseUrl_chainedWithAuth() {
+        TokenDto tokenDto = Pipeline.given(TestAuthRequests.login())
+                .then(new HttpTestClient().makeCall(200, TokenDto.class))
+                .execute();
+
+        HttpTestClient client = new HttpTestClient()
+                .withBaseUrl(Connections.USER_SERVICE_URL)
+                .withBearer(tokenDto.token());
+
+        UserDto created = Pipeline.given(
+                        new HttpCallRequest<>("/api/users", "POST", List.of(), TestUsers.defaultUser()))
+                .then(client.makeCall(201, UserDto.class))
+                .then(trackUser())
+                .execute();
+    }
 }
