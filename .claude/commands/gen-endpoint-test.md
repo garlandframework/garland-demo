@@ -84,7 +84,7 @@ Auth token is acquired once in `@BeforeSuite` and wired into `httpClient` automa
 
 ## Request factories
 
-Always use `TestUserRequests` — never construct `HttpCallRequest` inline in tests:
+Always use `TestUserRequests` — never construct `HttpCallRequest` inline in tests (exception: form/multipart bodies — see below):
 
 ```java
 TestUserRequests.createUser()               // POST /api/users, random valid payload
@@ -97,6 +97,31 @@ TestUserRequests.deleteUser(UUID id)        // DELETE /api/users/{id}
 TestAuthRequests.login()                        // POST /api/auth/login, admin credentials
 TestAuthRequests.login(String user, String pwd) // POST /api/auth/login, custom credentials
 ```
+
+## Content-type bodies
+
+This project's endpoints use JSON (`@RequestBody`). The two non-JSON body types are not needed here, but are available for projects that have form or upload endpoints.
+
+**FormBody** — use when an endpoint accepts `application/x-www-form-urlencoded`:
+```java
+new HttpCallRequest<>(Connections.AUTH_URL + "/oauth/token", "POST", List.of(),
+        new FormBody()
+                .field("grant_type", "client_credentials")
+                .field("client_id",  "my-client")
+                .field("client_secret", "secret"))
+```
+
+**MultipartBody** — use when an endpoint accepts `multipart/form-data` (file upload):
+```java
+new HttpCallRequest<>(Connections.FILES_URL + "/upload", "POST", List.of(),
+        new MultipartBody()
+                .field("description", "profile photo")
+                .file("photo", Path.of("/tmp/photo.jpg"), "image/jpeg"))
+// or from in-memory bytes:
+        .file("content", data, "hello.txt", "text/plain")
+```
+
+`Content-Type` is set automatically for both — do not add it manually.
 
 ## Test data factories
 

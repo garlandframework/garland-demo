@@ -4,7 +4,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import org.modulartestorchestrator.base.Pipeline;
 import org.modulartestorchestrator.base.retry.RetryConfig;
 import org.modulartestorchestrator.http.HttpTestClient;
+import org.modulartestorchestrator.http.model.FormBody;
 import org.modulartestorchestrator.http.model.HttpCallResponse;
+import org.modulartestorchestrator.http.model.HttpCallRequest;
+import org.modulartestorchestrator.http.model.MultipartBody;
 import org.mtodemo.tests.support.base.BaseTest;
 import org.mtodemo.tests.support.common.dto.ErrorDto;
 import org.mtodemo.tests.support.common.dto.TokenDto;
@@ -14,6 +17,7 @@ import org.mtodemo.tests.support.users.factory.TestUserRequests;
 import org.mtodemo.tests.support.users.factory.TestUsers;
 import org.testng.annotations.Test;
 
+import java.nio.file.Path;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -259,6 +263,80 @@ public class HttpExamples extends BaseTest {
     public void queryParam_invalidValue() {
         Pipeline.given(TestUserRequests.getAllUsers().withQueryParam("page", "-1"))
                 .then(httpClient.makeCall(400, ErrorDto.class))
+                .execute();
+    }
+
+    // =========================================================================
+    // Content-Type bodies
+    // =========================================================================
+
+    // -------------------------------------------------------------------------
+    // 13. FormBody — application/x-www-form-urlencoded
+    //
+    //     Pass a FormBody as the dto. HttpSteps detects it and:
+    //       - encodes all fields as percent-encoded key=value pairs
+    //       - sets Content-Type: application/x-www-form-urlencoded automatically
+    //     Typical use: OAuth2 token endpoints, legacy form APIs.
+    //
+    //     Disabled: this demo project has no form-encoded endpoint.
+    //     Remove @Test(enabled = false) and point at a real endpoint to run it.
+    // -------------------------------------------------------------------------
+
+    @Test(enabled = false, description = "POST with form-encoded body — OAuth2 token endpoint pattern")
+    public void formBody_oauthTokenRequest() {
+        TokenDto token = Pipeline.given(
+                        new HttpCallRequest<>(
+                                "http://localhost:8080/oauth/token",
+                                "POST",
+                                List.of(),
+                                new FormBody()
+                                        .field("grant_type", "client_credentials")
+                                        .field("client_id", "my-client")
+                                        .field("client_secret", "secret")))
+                .then(httpClient.makeCall(200, TokenDto.class))
+                .execute();
+    }
+
+    // -------------------------------------------------------------------------
+    // 14. MultipartBody — multipart/form-data
+    //
+    //     Pass a MultipartBody as the dto. HttpSteps detects it and:
+    //       - builds a multipart byte stream with a random boundary
+    //       - sets Content-Type: multipart/form-data; boundary=... automatically
+    //     Supports text fields (.field) and file parts from Path or byte[].
+    //     Typical use: file upload endpoints.
+    //
+    //     Disabled: this demo project has no multipart endpoint.
+    //     Remove @Test(enabled = false) and point at a real endpoint to run it.
+    // -------------------------------------------------------------------------
+
+    @Test(enabled = false, description = "POST multipart/form-data with a text field and a file — upload endpoint pattern")
+    public void multipartBody_fileUpload() throws Exception {
+        Pipeline.given(
+                        new HttpCallRequest<>(
+                                "http://localhost:8080/api/files",
+                                "POST",
+                                List.of(),
+                                new MultipartBody()
+                                        .field("description", "profile photo")
+                                        .file("photo", Path.of("/tmp/photo.jpg"), "image/jpeg")))
+                .then(httpClient.makeCall(201, Void.class))
+                .execute();
+    }
+
+    @Test(enabled = false, description = "POST multipart/form-data with in-memory bytes — no file on disk needed")
+    public void multipartBody_inMemoryBytes() throws Exception {
+        byte[] data = "hello world".getBytes();
+
+        Pipeline.given(
+                        new HttpCallRequest<>(
+                                "http://localhost:8080/api/files",
+                                "POST",
+                                List.of(),
+                                new MultipartBody()
+                                        .field("label", "greeting")
+                                        .file("content", data, "hello.txt", "text/plain")))
+                .then(httpClient.makeCall(201, Void.class))
                 .execute();
     }
 }
