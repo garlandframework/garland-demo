@@ -471,6 +471,37 @@ public class HttpExamples extends BaseTest {
     //     Disabled: this demo project uses Bearer auth, not cookies.
     // -------------------------------------------------------------------------
 
+    // =========================================================================
+    // File download
+    // =========================================================================
+
+    // -------------------------------------------------------------------------
+    // 23. downloadFile — save binary response to disk
+    //
+    //     Uses BodyHandlers.ofByteArray() so binary content is not corrupted
+    //     by charset conversion. Parent directories are created automatically.
+    //     Returns the Path for chaining (e.g. assert file size, read content).
+    //
+    //     Disabled: this demo project has no file download endpoint.
+    // -------------------------------------------------------------------------
+
+    @Test(enabled = false, description = "GET file download endpoint — response saved to disk as-is")
+    public void downloadFile_savesToDisk() throws Exception {
+        Path destination = Path.of(System.getProperty("java.io.tmpdir"), "report.pdf");
+
+        Path saved = Pipeline.given(
+                        new HttpCallRequest<>(
+                                Connections.USER_SERVICE_URL + "/api/reports/123/download",
+                                "GET",
+                                List.of(),
+                                null))
+                .then(httpClient.downloadFile(200, destination))
+                .execute();
+
+        // saved == destination; read back or assert size if needed
+        assert java.nio.file.Files.size(saved) > 0;
+    }
+
     @Test(enabled = false, description = "Request with a session cookie — cookie-auth endpoint pattern")
     public void cookie_sessionAuth() {
         Pipeline.given(TestUserRequests.createUser())
