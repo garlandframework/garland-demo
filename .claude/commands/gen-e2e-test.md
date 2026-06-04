@@ -47,7 +47,7 @@ A full e2e test walks this entire chain in order. Each system is asserted explic
 | Field | Type | Purpose |
 |---|---|---|
 | `httpClient` | `HttpTestClient` | HTTP calls to user-service |
-| `dbClient` | `PostgresTestClient` | Postgres via Hibernate |
+| `postgresClient` | `PostgresTestClient` | Postgres via Hibernate |
 | `kafkaClient` | `KafkaTestClient` | User-domain Kafka — `user.created`, `user.updated`, `user.deleted` |
 | `orderKafkaClient` | `KafkaTestClient` | Order-domain Kafka — `order.placed`, `order.cancelled` |
 | `mongoClient` | `MongoTestClient` | MongoDB projections |
@@ -69,7 +69,7 @@ public void createUser_fullSystemFlow() {
             .then(httpClient.makeCall(201, UserDto.class))
             .then(trackUser())
             .then(Verify.allOf(
-                    UserTestMapper.toEntity().andThen(dbClient.findById()),
+                    UserTestMapper.toEntity().andThen(postgresClient.findById()),
                     UserTestMapper.toCreatedEvent().andThen(kafkaClient.consumeMatching(UserCreatedEvent.class)),
                     UserTestMapper.dtoToCreatedProjectionDoc().andThen(mongoClient.findById())
             ))
@@ -89,7 +89,7 @@ public void updateUser_fullSystemFlow() {
     Pipeline.given(TestUserRequests.updateUser(created.getUuid(), updatePayload))
             .then(httpClient.makeCall(200, UserDto.class))
             .then(Verify.allOf(
-                    UserTestMapper.toEntity().andThen(dbClient.findById()),
+                    UserTestMapper.toEntity().andThen(postgresClient.findById()),
                     UserTestMapper.toUpdatedEvent().andThen(kafkaClient.consumeMatching(UserUpdatedEvent.class)),
                     UserTestMapper.dtoToUpdatedProjectionDoc().andThen(mongoClient.findById())
             ))
@@ -115,7 +115,7 @@ public void deleteUser_fullSystemFlow() {
 
     Pipeline.given(created)
             .then(Verify.allOf(
-                    UserTestMapper.toEntity().andThen(dbClient.notExistsById()),
+                    UserTestMapper.toEntity().andThen(postgresClient.notExistsById()),
                     UserTestMapper.toDeletedEvent().andThen(kafkaClient.consumeMatching(UserDeletedEvent.class)),
                     UserTestMapper.dtoToCreatedProjectionDoc().andThen(mongoClient.notExistsById())
             ))
@@ -159,11 +159,11 @@ Always use the static bridges on the mapper interface (not `Step.lift(INSTANCE::
 ## DB and MongoDB assertion steps
 
 ```java
-dbClient.findById()                           // asserts record exists and matches — throws if absent
-dbClient.findById(Duration temporalTolerance) // override default tolerance for this call
-dbClient.findByFields()                       // asserts unique match — throws if 0 or >1 results
-dbClient.countByFields()                      // returns Long count of matching records
-dbClient.notExistsById()                      // asserts record is absent — throws if present
+postgresClient.findById()                           // asserts record exists and matches — throws if absent
+postgresClient.findById(Duration temporalTolerance) // override default tolerance for this call
+postgresClient.findByFields()                       // asserts unique match — throws if 0 or >1 results
+postgresClient.countByFields()                      // returns Long count of matching records
+postgresClient.notExistsById()                      // asserts record is absent — throws if present
 
 mongoClient.findById()                            // asserts document exists and matches — throws if absent
 mongoClient.findById(Duration temporalTolerance)  // override default tolerance for this call

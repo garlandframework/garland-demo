@@ -36,7 +36,7 @@ public class UpdateUserApiTest extends BaseTest {
                 .then(httpClient.makeCall(200, UserDto.class))
                 .then(Verify.matching(updatePayload))
                 .then(UserTestMapper.toEntity())
-                .then(dbClient.findById())
+                .then(postgresClient.findById())
                 .execute();
     }
 
@@ -47,7 +47,7 @@ public class UpdateUserApiTest extends BaseTest {
                 .then(httpClient.makeCall(200, UserDto.class))
                 .then(Verify.matching(updatePayload))
                 .then(UserTestMapper.toEntity())
-                .then(dbClient.findById())
+                .then(postgresClient.findById())
                 .execute();
     }
 

@@ -43,7 +43,7 @@ public void createUser_persistedInDb_andPublishesKafkaEvent() {
             .then(httpClient.makeCall(201, UserDto.class))
             .then(trackUser())
             .then(Verify.allOf(
-                    UserTestMapper.toEntity().andThen(dbClient.findById()),
+                    UserTestMapper.toEntity().andThen(postgresClient.findById()),
                     UserTestMapper.toCreatedEvent().andThen(kafkaClient.consumeMatching(UserCreatedEvent.class))
             ))
             .execute();

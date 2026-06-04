@@ -26,7 +26,7 @@ public class OrderEndToEndTest extends BaseTest {
                 .then(httpClient.makeCall(201, OrderDto.class))
                 .then(trackOrder())
                 .then(Verify.allOf(
-                        OrderTestMapper.toEntity().andThen(dbClient.findById()),
+                        OrderTestMapper.toEntity().andThen(postgresClient.findById()),
                         OrderTestMapper.toPlacedEvent().andThen(orderKafkaClient.consumeMatching(OrderPlacedEvent.class)),
                         OrderTestMapper.toPlacedEvent().andThen(OrderTestMapper.toProjectionDoc()).andThen(mongoClient.findById())
                 ))
@@ -52,7 +52,7 @@ public class OrderEndToEndTest extends BaseTest {
 
         Pipeline.given(cancelled)
                 .then(Verify.allOf(
-                        OrderTestMapper.toEntity().andThen(dbClient.findById()),
+                        OrderTestMapper.toEntity().andThen(postgresClient.findById()),
                         OrderTestMapper.toCancelledEvent().andThen(orderKafkaClient.consumeMatching(OrderCancelledEvent.class)),
                         OrderTestMapper.toCancelledProjectionDoc().andThen(mongoClient.findById())
                 ))

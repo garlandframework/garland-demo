@@ -45,7 +45,7 @@ public abstract class BaseTest {
     private static final Logger log = LoggerFactory.getLogger(BaseTest.class);
 
     protected static HttpTestClient httpClient;
-    protected static PostgresTestClient dbClient;
+    protected static PostgresTestClient postgresClient;
     protected static KafkaTestClient kafkaClient;
     protected static KafkaTestClient orderKafkaClient;
     protected static MongoTestClient mongoClient;
@@ -113,7 +113,7 @@ public abstract class BaseTest {
                         .entity(OrderItemEntity.class)
                         .build()
         );
-        dbClient = new PostgresTestClient(postgres, RetryConfig.of(5, Duration.ofSeconds(2)))
+        postgresClient = new PostgresTestClient(postgres, RetryConfig.of(5, Duration.ofSeconds(2)))
                 .withTemporalTolerance(Duration.ofNanos(1000));
 
         log.info("=== Stage 2: warming up Kafka test consumers ===");

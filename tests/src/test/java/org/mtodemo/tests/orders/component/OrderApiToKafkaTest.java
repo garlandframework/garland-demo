@@ -25,7 +25,7 @@ public class OrderApiToKafkaTest extends BaseTest {
                 .then(httpClient.makeCall(201, OrderDto.class))
                 .then(trackOrder())
                 .then(Verify.allOf(
-                        OrderTestMapper.toEntity().andThen(dbClient.findById()),
+                        OrderTestMapper.toEntity().andThen(postgresClient.findById()),
                         OrderTestMapper.toPlacedEvent().andThen(orderKafkaClient.consumeMatching(OrderPlacedEvent.class))
                 ))
                 .execute();

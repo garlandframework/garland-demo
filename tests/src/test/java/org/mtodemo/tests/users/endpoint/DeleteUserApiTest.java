@@ -34,7 +34,7 @@ public class DeleteUserApiTest extends BaseTest {
 
         Pipeline.given(created)
                 .then(UserTestMapper.toEntity())
-                .then(dbClient.notExistsById())
+                .then(postgresClient.notExistsById())
                 .execute();
     }
 }

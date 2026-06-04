@@ -33,7 +33,7 @@ public class PlaceOrderApiTest extends BaseTest {
                 .then(trackOrder())
                 .then(Verify.matching(request.dto()))
                 .then(OrderTestMapper.toEntity())
-                .then(dbClient.findById())
+                .then(postgresClient.findById())
                 .execute();
     }
 

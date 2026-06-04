@@ -34,7 +34,7 @@ tests/src/test/java/org/mtodemo/tests/
 | Field | Type | Purpose |
 |---|---|---|
 | `httpClient` | `HttpTestClient` | HTTP calls to user-service and projection-service |
-| `dbClient` | `PostgresTestClient` | Postgres via Hibernate |
+| `postgresClient` | `PostgresTestClient` | Postgres via Hibernate |
 | `kafkaClient` | `KafkaTestClient` | User-domain Kafka (`user.created`, …) |
 | `orderKafkaClient` | `KafkaTestClient` | Order-domain Kafka (`order.placed`, …) |
 | `mongoClient` | `MongoTestClient` | MongoDB projections |
@@ -126,10 +126,10 @@ UserTestMapper.toProjectionDoc()      // UserDto → UserProjectionDoc (for Mong
 ## DB / Mongo assertion steps
 
 ```java
-dbClient.findById()                           // asserts record exists and matches — throws if absent
-dbClient.findByFields()                       // asserts unique match — throws if 0 or >1 results
-dbClient.countByFields()                      // returns Long count of matching records
-dbClient.notExistsById()                      // asserts record is absent — throws if present
+postgresClient.findById()                           // asserts record exists and matches — throws if absent
+postgresClient.findByFields()                       // asserts unique match — throws if 0 or >1 results
+postgresClient.countByFields()                      // returns Long count of matching records
+postgresClient.notExistsById()                      // asserts record is absent — throws if present
 
 mongoClient.findById()                            // asserts document exists and matches — throws if absent
 mongoClient.findByFields()                        // asserts unique match — throws if 0 or >1 results

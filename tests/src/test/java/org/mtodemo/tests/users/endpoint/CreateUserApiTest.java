@@ -25,7 +25,7 @@ public class CreateUserApiTest extends BaseTest {
                 .then(trackUser())
                 .then(Verify.matching(request.dto()))
                 .then(UserTestMapper.toEntity())
-                .then(dbClient.findById())
+                .then(postgresClient.findById())
                 .execute();
     }
 

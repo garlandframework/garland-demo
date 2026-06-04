@@ -47,7 +47,7 @@ public class CancelOrderApiTest extends BaseTest {
                 .then(httpClient.makeCall(200, OrderDto.class))
                 .then(Verify.matching(expectedCancelled))
                 .then(OrderTestMapper.toEntity())
-                .then(dbClient.findById())
+                .then(postgresClient.findById())
                 .execute();
     }
 }
