@@ -123,6 +123,17 @@ new HttpCallRequest<>(Connections.FILES_URL + "/upload", "POST", List.of(),
 
 `Content-Type` is set automatically for both — do not add it manually.
 
+**Raw string body** — pass a `String` as the `dto` to skip Jackson and send the string as-is. Content-Type defaults to `application/json`; add a header to override:
+```java
+// pre-built JSON fixture
+new HttpCallRequest<>(Connections.USER_SERVICE_URL + "/api/users", "POST", List.of(),
+        "{\"name\":\"Alice\",\"surname\":\"Smith\"}")
+
+// non-JSON (add Content-Type header)
+new HttpCallRequest<>(url, "POST",
+        List.of(new Header("Content-Type", "application/xml")), "<user/>")
+```
+
 ## Test data factories
 
 ```java

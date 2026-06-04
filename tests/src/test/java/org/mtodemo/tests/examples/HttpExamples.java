@@ -9,6 +9,7 @@ import org.modulartestorchestrator.http.model.HttpCallResponse;
 import org.modulartestorchestrator.http.model.HttpCallRequest;
 import org.modulartestorchestrator.http.model.MultipartBody;
 import org.mtodemo.tests.support.base.BaseTest;
+import org.mtodemo.tests.support.base.Connections;
 import org.mtodemo.tests.support.common.dto.ErrorDto;
 import org.mtodemo.tests.support.common.dto.TokenDto;
 import org.mtodemo.tests.support.common.factory.TestAuthRequests;
@@ -337,6 +338,61 @@ public class HttpExamples extends BaseTest {
                                         .field("label", "greeting")
                                         .file("content", data, "hello.txt", "text/plain")))
                 .then(httpClient.makeCall(201, Void.class))
+                .execute();
+    }
+
+    // =========================================================================
+    // Raw string body
+    // =========================================================================
+
+    // -------------------------------------------------------------------------
+    // 16. Raw JSON string body
+    //
+    //     Pass a String as dto — HttpSteps skips Jackson serialization and sends
+    //     the string as-is. Content-Type defaults to application/json unless
+    //     a Content-Type header is added to the request.
+    //
+    //     Use when: body comes from a fixture file, a captured replay, or is built
+    //     by string interpolation in a parameterized test.
+    // -------------------------------------------------------------------------
+
+    @Test(description = "POST with a pre-serialized JSON string body — skips Jackson")
+    public void rawStringBody_prebuiltJson() {
+        String json = "{\"name\":\"Alice\",\"surname\":\"Smith\"}";
+
+        UserDto created = Pipeline.given(
+                        new HttpCallRequest<>(
+                                Connections.USER_SERVICE_URL + "/api/users",
+                                "POST",
+                                List.of(),
+                                json))
+                .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
+                .execute();
+    }
+
+    // -------------------------------------------------------------------------
+    // 17. Raw non-JSON string body (XML, plain text, etc.)
+    //
+    //     Same as above, but with a Content-Type header added to the request to
+    //     override the application/json default. Use for any content type where
+    //     the body is already in its final string form.
+    //
+    //     Disabled: this demo project has no XML endpoint.
+    // -------------------------------------------------------------------------
+
+    @Test(enabled = false, description = "POST with a raw XML body — Content-Type overrides the default")
+    public void rawStringBody_xml() {
+        String xml = "<user><name>Alice</name><surname>Smith</surname></user>";
+
+        Pipeline.given(
+                        new HttpCallRequest<>(
+                                Connections.USER_SERVICE_URL + "/api/users",
+                                "POST",
+                                List.of(new org.modulartestorchestrator.http.model.Header("Content-Type", "application/xml")),
+                                xml))
+                .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
                 .execute();
     }
 }
