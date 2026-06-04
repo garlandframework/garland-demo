@@ -7,7 +7,9 @@ import lombok.RequiredArgsConstructor;
 import org.mtodemo.userservice.dto.UserDto;
 import org.mtodemo.userservice.dto.UserRequest;
 import org.mtodemo.userservice.service.UserService;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -50,5 +52,14 @@ public class UserController {
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         userService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}/export")
+    public ResponseEntity<byte[]> export(@PathVariable UUID id) {
+        byte[] csv = userService.exportCsv(id);
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType("text/csv"))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"user-" + id + ".csv\"")
+                .body(csv);
     }
 }

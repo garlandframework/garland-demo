@@ -535,20 +535,24 @@ public class HttpExamples extends BaseTest {
     //     Disabled: this demo project has no file download endpoint.
     // -------------------------------------------------------------------------
 
-    @Test(enabled = false, description = "GET file download endpoint — binary response saved to disk as-is")
+    @Test(description = "GET /api/users/{id}/export — binary CSV response saved to disk as-is")
     public void downloadFile_savesToDisk() throws Exception {
-        Path destination = Path.of(System.getProperty("java.io.tmpdir"), "report.pdf");
+        UserDto created = Pipeline.given(TestUserRequests.createUser())
+                .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
+                .execute();
+
+        Path destination = Path.of(System.getProperty("java.io.tmpdir"), "user-" + created.getUuid() + ".csv");
 
         Path saved = Pipeline.given(
                         new HttpCallRequest<>(
-                                Connections.USER_SERVICE_URL + "/api/reports/123/download",
+                                Connections.USER_SERVICE_URL + "/api/users/" + created.getUuid() + "/export",
                                 "GET",
                                 List.of(),
                                 null))
                 .then(httpClient.downloadFile(200, destination))
                 .execute();
 
-        // saved == destination; read back or assert file size if needed
         assert Files.size(saved) > 0;
     }
 }

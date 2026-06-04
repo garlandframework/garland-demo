@@ -17,6 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import org.springframework.data.domain.PageRequest;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -70,6 +71,14 @@ public class UserService {
         UserEntity entity = getOrThrow(id);
         userRepository.delete(entity);
         eventPublisher.publishDeleted(new UserDeletedEvent(entity.getId(), Instant.now()));
+    }
+
+    @Transactional(readOnly = true)
+    public byte[] exportCsv(UUID id) {
+        UserDto user = findById(id);
+        String csv = "uuid,name,surname,createdAt\n"
+                + user.uuid() + "," + user.name() + "," + user.surname() + "," + user.createdAt();
+        return csv.getBytes(StandardCharsets.UTF_8);
     }
 
     private UserEntity getOrThrow(UUID id) {
