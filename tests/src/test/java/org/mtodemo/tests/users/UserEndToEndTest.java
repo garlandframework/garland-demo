@@ -52,11 +52,13 @@ public class UserEndToEndTest extends BaseTest {
 
     @Test(description = "Updating a user triggers full system flow: Postgres updated, UserUpdatedEvent published to Kafka, MongoDB projection updated")
     public void updateUser_fullSystemFlow() {
-        UserDto updatePayload = TestUsers.defaultUser();
-        Pipeline.given(TestUserRequests.createUser())
+        UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .then(trackUser())
-                .then((created, ctx) -> TestUserRequests.updateUser(created.getUuid(), updatePayload))
+                .execute();
+
+        UserDto updatePayload = TestUsers.defaultUser();
+        Pipeline.given(TestUserRequests.updateUser(created.getUuid(), updatePayload))
                 .then(httpClient.makeCall(200, UserDto.class))
                 .then(Verify.allOf(
                         UserTestMapper.toEntity().andThen(postgresClient.findById()),

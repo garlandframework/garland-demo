@@ -32,10 +32,13 @@ public class GetOrderApiTest extends BaseTest {
 
     @Test(description = "GET /api/orders/{id} returns 200 and the order data matching the placed order")
     public void getOrderById_returnsCorrectOrder() {
-        OrderDto created = Pipeline.given(TestUserRequests.createUser())
+        UserDto user = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .then(trackUser())
-                .then((user, ctx) -> TestOrderRequests.placeOrder(TestOrders.builder().userId(user.getUuid()).build()))
+                .execute();
+
+        OrderDto created = Pipeline.given(TestOrderRequests.placeOrder(
+                        TestOrders.builder().userId(user.getUuid()).build()))
                 .then(httpClient.makeCall(201, OrderDto.class))
                 .then(trackOrder())
                 .execute();
