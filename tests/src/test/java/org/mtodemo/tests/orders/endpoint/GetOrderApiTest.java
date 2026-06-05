@@ -17,6 +17,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Test(description = "Endpoint tests for GET /api/orders: by id (found, not found) and by userId (orders present, empty list)")
 public class GetOrderApiTest extends BaseTest {
 
     // --- GET /api/orders/{id} ---

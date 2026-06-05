@@ -12,6 +12,7 @@ import org.mtodemo.tests.support.users.dto.UserDto;
 import org.mtodemo.tests.support.users.factory.TestUserRequests;
 import org.testng.annotations.Test;
 
+@Test(description = "Component test: placing an order via HTTP persists it in Postgres and publishes a matching OrderPlaced event to Kafka")
 public class OrderApiToKafkaTest extends BaseTest {
 
     @Test(description = "Placing an order via HTTP persists it in Postgres and publishes a matching OrderPlaced event to Kafka")

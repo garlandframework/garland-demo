@@ -10,6 +10,7 @@ import org.testng.annotations.Test;
 
 import java.util.Map;
 
+@Test(description = "Endpoint tests for authentication: missing token, invalid JWT, and wrong credentials all return 401")
 public class AuthTest extends BaseTest {
 
     @Test(description = "Request without Authorization header returns 401")

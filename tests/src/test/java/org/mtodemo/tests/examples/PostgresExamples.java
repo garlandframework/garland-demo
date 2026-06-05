@@ -21,6 +21,7 @@ import java.util.UUID;
  * Run all:        mvn test -pl tests -Dtest=PostgresExamples
  * Run one:        mvn test -pl tests -Dtest=PostgresExamples#findById
  */
+@Test(description = "Postgres client usage examples: find entity by id, temporal tolerance on timestamps, find by multiple fields, count-by-field assertion")
 public class PostgresExamples extends BaseTest {
 
     // -------------------------------------------------------------------------

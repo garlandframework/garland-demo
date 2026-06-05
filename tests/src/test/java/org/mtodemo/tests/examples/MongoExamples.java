@@ -23,6 +23,7 @@ import java.time.Duration;
  * Run all:        mvn test -pl tests -Dtest=MongoExamples
  * Run one:        mvn test -pl tests -Dtest=MongoExamples#findById
  */
+@Test(description = "MongoDB client usage examples: find by id, temporal tolerance on timestamps, find by field value, count-by-field assertion")
 public class MongoExamples extends BaseTest {
 
     // -------------------------------------------------------------------------

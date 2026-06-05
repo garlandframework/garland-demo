@@ -9,6 +9,7 @@ import org.mtodemo.tests.support.orders.factory.TestOrderEvents;
 import org.mtodemo.tests.support.orders.mapper.OrderTestMapper;
 import org.testng.annotations.Test;
 
+@Test(description = "Component test: OrderPlaced Kafka event published directly is consumed by projection-service and projected into MongoDB")
 public class KafkaToOrderProjectionTest extends BaseTest {
 
     @Test(description = "An OrderPlaced Kafka event published directly is projected into MongoDB by the projection-service")

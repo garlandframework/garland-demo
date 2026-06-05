@@ -12,8 +12,8 @@ import org.testng.annotations.Test;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
 
+@Test(description = "Flow tests for the users domain: CRUD lifecycle, list containment after create, list exclusion after delete")
 public class UserFlowTest extends BaseTest {
 
     // --- read consistency ---
@@ -110,13 +110,10 @@ public class UserFlowTest extends BaseTest {
                 .then(httpClient.makeCall(204, Void.class))
                 .execute();
 
-        List<UserDto> all = Pipeline.given(TestUserRequests.getAllUsers())
+        Pipeline.given(TestUserRequests.getAllUsers())
                 .then(httpClient.makeCall(200, new TypeReference<List<UserDto>>() {}))
+                .then(Verify.doesNotContain(List.of(created)))
                 .execute();
-
-        assertThat(all)
-                .usingRecursiveFieldByFieldElementComparator()
-                .doesNotContain(created);
     }
 
     @Test(description = "Deleting an already deleted user returns 404")
@@ -220,12 +217,9 @@ public class UserFlowTest extends BaseTest {
                 .then(Verify.matching(ErrorDto.withStatus(404)))
                 .execute();
 
-        List<UserDto> all = Pipeline.given(TestUserRequests.getAllUsers())
+        Pipeline.given(TestUserRequests.getAllUsers())
                 .then(httpClient.makeCall(200, new TypeReference<List<UserDto>>() {}))
+                .then(Verify.doesNotContain(List.of(created)))
                 .execute();
-
-        assertThat(all)
-                .usingRecursiveFieldByFieldElementComparator()
-                .doesNotContain(created);
     }
 }

@@ -15,6 +15,7 @@ import org.testng.annotations.Test;
 
 import java.util.UUID;
 
+@Test(description = "Endpoint tests for PUT /api/orders/{id}/cancel: not found and successful cancellation with Postgres verification")
 public class CancelOrderApiTest extends BaseTest {
 
     @Test(description = "PUT /api/orders/{id}/cancel with non-existent id returns 404 with error body")

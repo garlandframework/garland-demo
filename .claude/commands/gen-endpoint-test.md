@@ -320,6 +320,7 @@ Pipeline.given(TestUserRequests.getAllUsers().withQueryParam("page", "abc"))
 When every test in a class requires a pre-existing entity (e.g. a PUT or DELETE endpoint test), declare the entity as an instance field and create it once per test in `@BeforeMethod`. Do not repeat the setup pipeline inside each test method.
 
 ```java
+@Test(description = "Endpoint tests for PUT /api/users/{id}: ...")
 public class UpdateUserApiTest extends BaseTest {
 
     private UserDto created;
@@ -363,6 +364,7 @@ UserDto user = Pipeline.given(TestUserRequests.createUser())
 
 - Always call `trackUser()`/`trackOrder()` even if the test itself deletes or cancels the resource — if the test fails before its own cleanup step, the tracker ensures it still runs
 - Never truncate test data directly in the database — it bypasses the application layer and leaves MongoDB projections and Kafka state inconsistent
+- **Class-level description** — put `@Test(description = "...")` on the class as well as on each method. The class description is one sentence summarising the class's scope (e.g. `"Endpoint tests for POST /api/users: successful creation with Postgres verification and validation rejections for required fields"`)
 
 ---
 

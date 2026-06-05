@@ -33,6 +33,7 @@ import java.util.UUID;
  * Run all:        mvn test -pl tests -Dtest=HttpExamples
  * Run one:        mvn test -pl tests -Dtest=HttpExamples#makeCall_statusOnly
  */
+@Test(description = "HTTP client usage examples: status-only call, body assertion, temporal tolerance, list response, error response, auth flows, query params, form and multipart body, base URL and timeout configuration, binary response")
 public class HttpExamples extends BaseTest {
 
     // =========================================================================

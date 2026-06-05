@@ -17,6 +17,7 @@ import org.testng.annotations.Test;
 import java.util.List;
 import java.util.UUID;
 
+@Test(description = "Endpoint tests for PUT /api/users/{id}: successful update, required-fields-only update, not found, and validation rejections")
 public class UpdateUserApiTest extends BaseTest {
 
     private UserDto created;

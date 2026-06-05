@@ -11,6 +11,7 @@ import org.testng.annotations.Test;
 
 import java.util.UUID;
 
+@Test(description = "Endpoint tests for DELETE /api/users/{id}: not found and successful deletion with Postgres verification")
 public class DeleteUserApiTest extends BaseTest {
 
     @Test(description = "DELETE /api/users/{id} with non-existent id returns 404 with error body")

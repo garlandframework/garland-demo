@@ -15,6 +15,7 @@ import org.testng.annotations.Test;
 
 import java.util.List;
 
+@Test(description = "Endpoint tests for POST /api/users: successful creation with Postgres verification and validation rejections for required fields")
 public class CreateUserApiTest extends BaseTest {
 
     @Test(description = "POST /api/users with valid data returns 201 and user is persisted in Postgres")

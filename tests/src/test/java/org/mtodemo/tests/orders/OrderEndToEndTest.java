@@ -13,6 +13,7 @@ import org.mtodemo.tests.support.users.dto.UserDto;
 import org.mtodemo.tests.support.users.factory.TestUserRequests;
 import org.testng.annotations.Test;
 
+@Test(description = "End-to-end tests for order flows: place and cancel each trigger the full system flow across Postgres, Kafka, and MongoDB")
 public class OrderEndToEndTest extends BaseTest {
 
     @Test(description = "Placing an order triggers full system flow: persisted in Postgres, OrderPlaced event published to Kafka, projected into MongoDB")

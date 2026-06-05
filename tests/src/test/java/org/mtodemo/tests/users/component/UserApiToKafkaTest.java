@@ -9,6 +9,7 @@ import org.mtodemo.tests.support.users.factory.TestUserRequests;
 import org.mtodemo.tests.support.users.mapper.UserTestMapper;
 import org.testng.annotations.Test;
 
+@Test(description = "Component test: creating a user via HTTP persists it in Postgres and publishes a matching UserCreated event to Kafka")
 public class UserApiToKafkaTest extends BaseTest {
 
     @Test(description = "Creating a user via HTTP persists it in Postgres and publishes a matching UserCreated event to Kafka")

@@ -12,6 +12,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Test(description = "Endpoint tests for GET /api/users: empty list when no users exist and list containing all created users")
 public class GetAllUsersApiTest extends BaseTest {
 
     @Test(description = "GET /api/users returns 200 and empty list when no users exist")

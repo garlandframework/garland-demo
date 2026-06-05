@@ -12,6 +12,7 @@ import org.mtodemo.tests.support.users.factory.TestUsers;
 import org.mtodemo.tests.support.users.mapper.UserTestMapper;
 import org.testng.annotations.Test;
 
+@Test(description = "End-to-end tests for user-related flows, covering the full system from API to Postgres, Kafka, and MongoDB")
 public class UserEndToEndTest extends BaseTest {
 
     @Test(description = "Created user is persisted in Postgres and a UserCreated event is published to Kafka")
@@ -67,7 +68,8 @@ public class UserEndToEndTest extends BaseTest {
                 .execute();
     }
 
-    @Test(description = "Deleting a user triggers full system flow: removed from Postgres, UserDeletedEvent published to Kafka, MongoDB projection removed")
+    @Test(description = "Deleting a user tri" +
+            "ggers full system flow: removed from Postgres, UserDeletedEvent published to Kafka, MongoDB projection removed")
     public void deleteUser_fullSystemFlow() {
         UserDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))

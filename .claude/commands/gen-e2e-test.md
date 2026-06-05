@@ -238,6 +238,7 @@ TestUsers.requiredFieldsOnlyUser()         // name + surname only
 - **Prefer temporal tolerance over `null` for timestamp fields** — `null` skips the field entirely; tolerance still verifies the field is present and within bounds. Use `consumeMatching(Class, Duration)` for events with service-generated timestamps. Use `null` only for truly unpredictable non-temporal fields.
 - **No validation or error tests** — blank/null/size tests belong in endpoint tests
 - **description** reads as a system-level story: "Creating a user triggers full system flow: ...", not "Test create e2e"
+- **Class-level description** — put `@Test(description = "...")` on the class as well as on each method. The class description is one sentence summarising the class's scope (e.g. `"End-to-end tests for user flows: create, update, delete each trigger the full system flow across Postgres, Kafka, and MongoDB"`)
 - **Cross-domain FK — always create the dependency first** — `PLACEHOLDER_USER_ID` must not be used in e2e tests. E2e tests persist to the database; services validate FK existence at the service/DB layer. Create the referenced entity in a setup pipeline and use the returned UUID.
 - **Use the correct Kafka client per domain** — `kafkaClient` for `user.*` events, `orderKafkaClient` for `order.*` events
 - **Track every created resource** — call `.then(trackUser())` after every `makeCall(201, UserDto.class)` and `.then(trackOrder())` after every `makeCall(201, OrderDto.class)`, even if the test itself performs the deletion

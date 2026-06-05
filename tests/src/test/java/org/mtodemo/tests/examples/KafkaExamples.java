@@ -25,7 +25,7 @@ import java.time.Duration;
  * IMPORTANT: All tests here share the Kafka topic. Run sequentially to prevent
  * event contamination — singleThreaded = true is set on the class for this reason.
  */
-@Test(singleThreaded = true)
+@Test(singleThreaded = true, description = "Kafka consumer usage examples: consume with content assertion, temporal SLA tolerance, and raw consumption without assertion")
 public class KafkaExamples extends BaseTest {
 
     // -------------------------------------------------------------------------

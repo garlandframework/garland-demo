@@ -11,6 +11,7 @@ import org.mtodemo.tests.support.users.dto.UserDto;
 import org.mtodemo.tests.support.users.factory.TestUserRequests;
 import org.testng.annotations.Test;
 
+@Test(description = "Flow tests for the orders domain: retrieve placed order by id and retrieve cancelled order by id")
 public class OrderFlowTest extends BaseTest {
 
     @Test(description = "Placed order can be retrieved by id with all original data intact")

@@ -10,6 +10,7 @@ import org.testng.annotations.Test;
 
 import java.util.UUID;
 
+@Test(description = "Endpoint tests for GET /api/users/{id}: not found and successful retrieval")
 public class GetUserByIdApiTest extends BaseTest {
 
     @Test(description = "GET /api/users/{id} with non-existent id returns 404 with error body")

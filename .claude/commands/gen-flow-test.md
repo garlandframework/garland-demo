@@ -116,12 +116,10 @@ public void createThenDelete_thenGetAll_doesNotContainUser() throws Exception {
             .then(httpClient.makeCall(204, Void.class))
             .execute();
 
-    List<UserDto> all = Pipeline.given(TestUserRequests.getAllUsers())
+    Pipeline.given(TestUserRequests.getAllUsers())
             .then(httpClient.makeCall(200, new TypeReference<List<UserDto>>() {}))
+            .then(Verify.doesNotContain(List.of(created)))
             .execute();
-
-    assertThat(all).usingRecursiveFieldByFieldElementComparator()
-            .doesNotContain(created);
 }
 ```
 
@@ -131,8 +129,9 @@ public void createThenDelete_thenGetAll_doesNotContainUser() throws Exception {
 - **Focus on state transitions**: does the system reflect the change correctly in subsequent reads?
 - **One pipeline per operation** — do not chain create→update in a single pipeline just because you can; separate pipelines make the flow readable as a sequence of steps
 - **Carry state via local variables** — the created UUID or DTO is assigned to a variable and reused in subsequent pipelines
-- **Use `Verify.matching`** for response body checks; use `Verify.containsAll` for list inclusion; use `assertThat(...).doesNotContain(...)` for list exclusion
+- **Use `Verify.matching`** for response body checks; use `Verify.containsAll` for list inclusion; use `Verify.doesNotContain` for list exclusion — never raw `assertThat`
 - **description** should read as a user story: "Created user can be retrieved by id", not "Test create then get"
+- **Class-level description** — put `@Test(description = "...")` on the class as well as on each method. The class description is one sentence summarising the class's scope (e.g. `"Flow tests for the users domain: CRUD lifecycle, list containment after create, list exclusion after delete"`)
 - **Do not re-test persistence in DB** — that is covered by endpoint tests; flow tests only verify API-level consistency
 - **Track every created user** — add `.then(trackUser())` after every `makeCall(201, UserDto.class)`, even in tests that delete the user themselves
 
@@ -140,7 +139,6 @@ public void createThenDelete_thenGetAll_doesNotContainUser() throws Exception {
 
 ```java
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.assertj.core.api.Assertions.assertThat;
 import org.modulartestorchestrator.base.Pipeline;
 import org.modulartestorchestrator.base.checks.Verify;
 import org.mtodemo.tests.support.base.BaseTest;

@@ -9,6 +9,7 @@ import org.mtodemo.tests.support.users.factory.TestUserEvents;
 import org.mtodemo.tests.support.users.mapper.UserTestMapper;
 import org.testng.annotations.Test;
 
+@Test(description = "Component test: UserCreated Kafka event published directly is consumed by projection-service and projected into MongoDB")
 public class KafkaToProjectionTest extends BaseTest {
 
     @Test(description = "A UserCreated Kafka event published directly is projected into MongoDB by the projection-service")

@@ -17,6 +17,7 @@ import org.testng.annotations.Test;
 import java.math.BigDecimal;
 import java.util.List;
 
+@Test(description = "Endpoint tests for POST /api/orders: successful creation with Postgres verification and validation rejections for required fields")
 public class PlaceOrderApiTest extends BaseTest {
 
     @Test(description = "POST /api/orders with valid data returns 201 and order is persisted in Postgres")

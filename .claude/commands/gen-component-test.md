@@ -113,6 +113,7 @@ Component tests share the Kafka topic with other test levels. Run them sequentia
 - **Cross-domain FK in Slice 1 happy-path tests** — `PLACEHOLDER_USER_ID` is valid for validation (400) tests. For happy-path Slice 1 tests that persist an order, create a real user first and use `user.getUuid()`. Services validate FK existence at the database layer, not just at annotation validation.
 - **Use the correct Kafka client** — `kafkaClient` for user-domain events, `orderKafkaClient` for order-domain events
 - **Track HTTP-created resources** — add `.then(trackUser())` after every `makeCall(201, UserDto.class)` and `.then(trackOrder())` after every `makeCall(201, OrderDto.class)` in Slice 1 tests
+- **Class-level description** — put `@Test(description = "...")` on the class as well as on each method. The class description is one sentence summarising the class's scope (e.g. `"Component test: creating a user via HTTP persists it in Postgres and publishes a matching UserCreated event to Kafka"`)
 
 ## Imports reference
 
