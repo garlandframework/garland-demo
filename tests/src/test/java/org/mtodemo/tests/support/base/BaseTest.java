@@ -3,6 +3,7 @@ package org.mtodemo.tests.support.base;
 import org.modulartestorchestrator.base.Pipeline;
 import org.modulartestorchestrator.base.Step;
 import org.modulartestorchestrator.base.retry.RetryConfig;
+import org.modulartestorchestrator.base.tracker.ResourceTracker;
 import org.modulartestorchestrator.http.HttpTestClient;
 import org.mtodemo.tests.support.common.dto.TokenDto;
 import org.mtodemo.tests.support.common.factory.TestAuthRequests;
@@ -26,22 +27,20 @@ import org.modulartestorchestrator.mongodb.MongoWrapper;
 import org.modulartestorchestrator.postgres.PostgresConfig;
 import org.modulartestorchestrator.postgres.PostgresTestClient;
 import org.modulartestorchestrator.postgres.PostgresWrapper;
+import org.modulartestorchestrator.testng.AbstractMtoBaseTest;
+import org.modulartestorchestrator.testng.TestNGLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.BeforeTest;
-import org.modulartestorchestrator.testng.TestNGLogger;
 import org.testng.annotations.Listeners;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Listeners(TestNGLogger.class)
-public abstract class BaseTest {
+public abstract class BaseTest extends AbstractMtoBaseTest {
 
     private static final Logger log = LoggerFactory.getLogger(BaseTest.class);
 
@@ -54,40 +53,27 @@ public abstract class BaseTest {
     protected static PostgresWrapper postgres;
     protected static MongoWrapper mongo;
 
-    private final List<UUID> createdUserIds  = new ArrayList<>();
-    private final List<UUID> createdOrderIds = new ArrayList<>();
+    protected final ResourceTracker<UUID> orderTracker = new ResourceTracker<>(
+            id -> Pipeline.given(TestOrderRequests.cancelOrder(id))
+                          .then(httpClient.makeCall(200, OrderDto.class))
+                          .execute()
+    );
+    protected final ResourceTracker<UUID> userTracker = new ResourceTracker<>(
+            id -> Pipeline.given(TestUserRequests.deleteUser(id))
+                          .then(httpClient.makeCall(204, Void.class))
+                          .execute()
+    );
+
+    protected BaseTest() {
+        registerTrackers(orderTracker, userTracker);
+    }
 
     protected Step<UserDto, UserDto> trackUser() {
-        return (dto, ctx) -> { createdUserIds.add(dto.getUuid()); return dto; };
+        return userTracker.track(UserDto::getUuid);
     }
 
     protected Step<OrderDto, OrderDto> trackOrder() {
-        return (dto, ctx) -> { createdOrderIds.add(dto.getUuid()); return dto; };
-    }
-
-    @AfterMethod(alwaysRun = true)
-    public void cleanupResources() {
-        for (UUID id : new ArrayList<>(createdOrderIds)) {
-            try {
-                Pipeline.given(TestOrderRequests.cancelOrder(id))
-                        .then(httpClient.makeCall(200, OrderDto.class))
-                        .execute();
-            } catch (Throwable e) {
-                log.warn("Cleanup: failed to cancel order {}: {}", id, e.getMessage());
-            }
-        }
-        createdOrderIds.clear();
-
-        for (UUID id : new ArrayList<>(createdUserIds)) {
-            try {
-                Pipeline.given(TestUserRequests.deleteUser(id))
-                        .then(httpClient.makeCall(204, Void.class))
-                        .execute();
-            } catch (Throwable e) {
-                log.warn("Cleanup: failed to delete user {}: {}", id, e.getMessage());
-            }
-        }
-        createdUserIds.clear();
+        return orderTracker.track(OrderDto::getUuid);
     }
 
     @BeforeSuite
