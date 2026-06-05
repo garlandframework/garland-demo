@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
-import java.util.List;
 
 public class EnvironmentReadinessChecker {
 
@@ -29,7 +28,7 @@ public class EnvironmentReadinessChecker {
     private void checkHealth(String name, String url) {
         log.info("  Polling {} at {} ...", name, url);
         HttpTestClient probe = new HttpTestClient(RetryConfig.of(60, Duration.ofSeconds(2)));
-        Pipeline.given(new HttpCallRequest<>(url, "GET", List.of(), null))
+        Pipeline.given(HttpCallRequest.get(url))
                 .then(probe.makeCall(200, HealthDto.class))
                 .then(Verify.matching(new HealthDto("UP")))
                 .execute();

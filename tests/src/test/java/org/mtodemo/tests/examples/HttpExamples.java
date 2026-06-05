@@ -348,11 +348,7 @@ public class HttpExamples extends BaseTest {
         String json = "{\"name\":\"Alice\",\"surname\":\"Smith\"}";
 
         UserDto created = Pipeline.given(
-                        new HttpCallRequest<>(
-                                Connections.USER_SERVICE_URL + "/api/users",
-                                "POST",
-                                List.of(),
-                                json))
+                        HttpCallRequest.post(Connections.USER_SERVICE_URL + "/api/users", json))
                 .then(httpClient.makeCall(201, UserDto.class))
                 .then(trackUser())
                 .execute();
@@ -400,7 +396,7 @@ public class HttpExamples extends BaseTest {
         HttpTestClient client = httpClient.withBaseUrl(Connections.USER_SERVICE_URL);
 
         UserDto created = Pipeline.given(
-                        new HttpCallRequest<>("/api/users", "POST", List.of(), TestUsers.defaultUser()))
+                        HttpCallRequest.post("/api/users", TestUsers.defaultUser()))
                 .then(client.makeCall(201, UserDto.class))
                 .then(trackUser())
                 .execute();
@@ -425,7 +421,7 @@ public class HttpExamples extends BaseTest {
                 .withBearer(tokenDto.token());
 
         UserDto created = Pipeline.given(
-                        new HttpCallRequest<>("/api/users", "POST", List.of(), TestUsers.defaultUser()))
+                        HttpCallRequest.post("/api/users", TestUsers.defaultUser()))
                 .then(client.makeCall(201, UserDto.class))
                 .then(trackUser())
                 .execute();
@@ -468,7 +464,7 @@ public class HttpExamples extends BaseTest {
                 .withTimeout(Duration.ofSeconds(10));
 
         UserDto created = Pipeline.given(
-                        new HttpCallRequest<>("/api/users", "POST", List.of(), TestUsers.defaultUser()))
+                        HttpCallRequest.post("/api/users", TestUsers.defaultUser()))
                 .then(client.makeCall(201, UserDto.class))
                 .then(trackUser())
                 .execute();

@@ -5,8 +5,6 @@ import org.modulartestorchestrator.http.model.HttpCallRequest;
 import org.mtodemo.tests.support.base.Connections;
 import org.mtodemo.tests.support.common.dto.LoginRequest;
 
-import java.util.List;
-
 public class TestAuthRequests {
 
     private static final String BASE_URL = Connections.USER_SERVICE_URL + "/api/auth";
@@ -16,14 +14,12 @@ public class TestAuthRequests {
     }
 
     public static HttpCallRequest<LoginRequest> login(String username, String password) {
-        return new HttpCallRequest<>(BASE_URL + "/login", "POST", List.of(), new LoginRequest(username, password));
+        return HttpCallRequest.post(BASE_URL + "/login", new LoginRequest(username, password));
     }
 
     public static HttpCallRequest<FormBody> oauthToken() {
-        return new HttpCallRequest<>(
+        return HttpCallRequest.post(
                 Connections.USER_SERVICE_URL + "/oauth/token",
-                "POST",
-                List.of(),
                 new FormBody()
                         .field("grant_type", "client_credentials")
                         .field("client_id", Connections.ADMIN_USERNAME)
