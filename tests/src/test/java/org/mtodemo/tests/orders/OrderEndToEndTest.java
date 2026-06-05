@@ -18,12 +18,10 @@ public class OrderEndToEndTest extends BaseTest {
 
     @Test(description = "Placing an order triggers full system flow: persisted in Postgres, OrderPlaced event published to Kafka, projected into MongoDB")
     public void placeOrder_fullSystemFlow() {
-        UserDto user = Pipeline.given(TestUserRequests.createUser())
+        Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .then(trackUser())
-                .execute();
-
-        Pipeline.given(TestOrderRequests.placeOrder(TestOrders.builder().userId(user.getUuid()).build()))
+                .then((user, ctx) -> TestOrderRequests.placeOrder(TestOrders.builder().userId(user.getUuid()).build()))
                 .then(httpClient.makeCall(201, OrderDto.class))
                 .then(trackOrder())
                 .then(Verify.allOf(
@@ -36,22 +34,16 @@ public class OrderEndToEndTest extends BaseTest {
 
     @Test(description = "Cancelling an order triggers full system flow: Postgres updated to CANCELLED, OrderCancelled event published to Kafka, MongoDB projection updated to CANCELLED")
     public void cancelOrder_fullSystemFlow() {
-        UserDto user = Pipeline.given(TestUserRequests.createUser())
+        OrderDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .then(trackUser())
-                .execute();
-
-        OrderDto created = Pipeline.given(TestOrderRequests.placeOrder(
-                        TestOrders.builder().userId(user.getUuid()).build()))
+                .then((user, ctx) -> TestOrderRequests.placeOrder(TestOrders.builder().userId(user.getUuid()).build()))
                 .then(httpClient.makeCall(201, OrderDto.class))
                 .then(trackOrder())
                 .execute();
 
-        OrderDto cancelled = Pipeline.given(TestOrderRequests.cancelOrder(created.getUuid()))
+        Pipeline.given(TestOrderRequests.cancelOrder(created.getUuid()))
                 .then(httpClient.makeCall(200, OrderDto.class))
-                .execute();
-
-        Pipeline.given(cancelled)
                 .then(Verify.allOf(
                         OrderTestMapper.toEntity().andThen(postgresClient.findById()),
                         OrderTestMapper.toCancelledEvent().andThen(orderKafkaClient.consumeMatching(OrderCancelledEvent.class)),

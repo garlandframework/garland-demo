@@ -16,13 +16,10 @@ public class OrderFlowTest extends BaseTest {
 
     @Test(description = "Placed order can be retrieved by id with all original data intact")
     public void placeThenGetById_orderRetrievable() {
-        UserDto user = Pipeline.given(TestUserRequests.createUser())
+        OrderDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .then(trackUser())
-                .execute();
-
-        OrderDto created = Pipeline.given(TestOrderRequests.placeOrder(
-                        TestOrders.builder().userId(user.getUuid()).build()))
+                .then((user, ctx) -> TestOrderRequests.placeOrder(TestOrders.builder().userId(user.getUuid()).build()))
                 .then(httpClient.makeCall(201, OrderDto.class))
                 .then(trackOrder())
                 .execute();
@@ -35,13 +32,10 @@ public class OrderFlowTest extends BaseTest {
 
     @Test(description = "Cancelled order is reflected as CANCELLED when retrieved by id")
     public void placeThenCancel_thenGetById_statusIsCancelled() {
-        UserDto user = Pipeline.given(TestUserRequests.createUser())
+        OrderDto created = Pipeline.given(TestUserRequests.createUser())
                 .then(httpClient.makeCall(201, UserDto.class))
                 .then(trackUser())
-                .execute();
-
-        OrderDto created = Pipeline.given(TestOrderRequests.placeOrder(
-                        TestOrders.builder().userId(user.getUuid()).build()))
+                .then((user, ctx) -> TestOrderRequests.placeOrder(TestOrders.builder().userId(user.getUuid()).build()))
                 .then(httpClient.makeCall(201, OrderDto.class))
                 .then(trackOrder())
                 .execute();
