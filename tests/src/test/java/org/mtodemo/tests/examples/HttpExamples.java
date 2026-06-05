@@ -521,4 +521,33 @@ public class HttpExamples extends BaseTest {
 
         assert Files.size(saved) > 0;
     }
+
+    // =========================================================================
+    // Pipeline value reinject
+    // =========================================================================
+
+    // -------------------------------------------------------------------------
+    // 24. then(ignored -> captured) — continue a pipeline after a void step
+    //
+    //     Steps like DELETE return Void, severing the type chain. Capture the
+    //     value you need before the void step, then reinject it with a lambda
+    //     that ignores the Void input and returns the captured value.
+    //
+    //     Use this when the action and its verification belong in the same
+    //     logical sequence. When the two are unrelated, prefer two pipelines.
+    // -------------------------------------------------------------------------
+
+    @Test(description = "DELETE user then verify 404 — reinject captured UserDto after void step to continue the pipeline")
+    public void reinject_continuePipelineAfterVoidStep() {
+        UserDto created = Pipeline.given(TestUserRequests.createUser())
+                .then(httpClient.makeCall(201, UserDto.class))
+                .then(trackUser())
+                .execute();
+
+        Pipeline.given(TestUserRequests.deleteUser(created.getUuid()))
+                .then(httpClient.makeCall(204, Void.class))
+                .then((ignored, ctx) -> TestUserRequests.getUser(created.getUuid()))
+                .then(httpClient.makeCall(404, ErrorDto.class))
+                .execute();
+    }
 }
