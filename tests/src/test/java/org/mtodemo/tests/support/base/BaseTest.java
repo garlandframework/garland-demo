@@ -32,6 +32,7 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.BeforeTest;
+import org.modulartestorchestrator.testng.TestNGLogger;
 import org.testng.annotations.Listeners;
 
 import java.time.Duration;
@@ -39,7 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@Listeners(TestLogger.class)
+@Listeners(TestNGLogger.class)
 public abstract class BaseTest {
 
     private static final Logger log = LoggerFactory.getLogger(BaseTest.class);
