@@ -22,7 +22,7 @@ public class KafkaToProjectionTest extends BaseTest {
 
         UserProjectionDoc expectedDoc = UserTestMapper.INSTANCE.toProjectionDoc(event);
         Pipeline.given(expectedDoc)
-                .then(mongoClient.findById())
+                .then(mongoClient.findByFields())
                 .execute();
     }
 }

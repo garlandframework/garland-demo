@@ -24,7 +24,7 @@ public class UserEndToEndTest extends BaseTest {
                 .then(httpClient.makeCall(201, UserDto.class))
                 .then(trackUser())
                 .then(Verify.allOf(
-                        UserTestMapper.toEntity().andThen(postgresClient.findById()),
+                        UserTestMapper.toEntity().andThen(postgresClient.findByFields()),
                         UserTestMapper.toCreatedEvent().andThen(kafkaClient.consumeMatching(UserCreatedEvent.class))
                 ))
                 .execute();
@@ -59,13 +59,16 @@ public class UserEndToEndTest extends BaseTest {
 
     @Test(description = "Creating a user triggers full system flow: Postgres persistence, Kafka event, and MongoDB projection")
     public void createUser_fullSystemFlow() {
-        Pipeline.given(TestUserRequests.createUser())
+        UserDto expected = TestUsers.defaultUser();
+
+        Pipeline.given(TestUserRequests.createUser(expected))
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(Verify.matching(expected))
                 .then(trackUser())
                 .then(Verify.allOf(
-                        UserTestMapper.toEntity().andThen(postgresClient.findById()),
+                        UserTestMapper.toEntity().andThen(postgresClient.findByFields()),
                         UserTestMapper.toCreatedEvent().andThen(kafkaClient.consumeMatching(UserCreatedEvent.class)),
-                        UserTestMapper.dtoToCreatedProjectionDoc().andThen(mongoClient.findById())
+                        UserTestMapper.dtoToCreatedProjectionDoc().andThen(mongoClient.findByFields())
                 ))
                 .execute();
     }
@@ -80,10 +83,11 @@ public class UserEndToEndTest extends BaseTest {
         UserDto updatePayload = TestUsers.defaultUser();
         Pipeline.given(TestUserRequests.updateUser(created.getUuid(), updatePayload))
                 .then(httpClient.makeCall(200, UserDto.class))
+                .then(Verify.matching(updatePayload))
                 .then(Verify.allOf(
-                        UserTestMapper.toEntity().andThen(postgresClient.findById()),
+                        UserTestMapper.toEntity().andThen(postgresClient.findByFields()),
                         UserTestMapper.toUpdatedEvent().andThen(kafkaClient.consumeMatching(UserUpdatedEvent.class)),
-                        UserTestMapper.dtoToUpdatedProjectionDoc().andThen(mongoClient.findById())
+                        UserTestMapper.dtoToUpdatedProjectionDoc().andThen(mongoClient.findByFields())
                 ))
                 .execute();
     }

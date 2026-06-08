@@ -5,7 +5,9 @@ import dev.garlandframework.base.checks.Verify;
 import dev.garlandframework.demo.tests.support.base.BaseTest;
 import dev.garlandframework.demo.tests.support.users.dto.UserDto;
 import dev.garlandframework.demo.tests.support.users.event.UserCreatedEvent;
+import dev.garlandframework.demo.tests.support.users.dto.UserDto;
 import dev.garlandframework.demo.tests.support.users.factory.TestUserRequests;
+import dev.garlandframework.demo.tests.support.users.factory.TestUsers;
 import dev.garlandframework.demo.tests.support.users.mapper.UserTestMapper;
 import org.testng.annotations.Test;
 
@@ -14,11 +16,14 @@ public class UserApiToKafkaTest extends BaseTest {
 
     @Test(description = "Creating a user via HTTP persists it in Postgres and publishes a matching UserCreated event to Kafka")
     public void createUser_persistedInDb_andPublishesKafkaEvent() {
-        Pipeline.given(TestUserRequests.createUser())
+        UserDto expected = TestUsers.defaultUser();
+
+        Pipeline.given(TestUserRequests.createUser(expected))
                 .then(httpClient.makeCall(201, UserDto.class))
+                .then(Verify.matching(expected))
                 .then(trackUser())
                 .then(Verify.allOf(
-                        UserTestMapper.toEntity().andThen(postgresClient.findById()),
+                        UserTestMapper.toEntity().andThen(postgresClient.findByFields()),
                         UserTestMapper.toCreatedEvent().andThen(kafkaClient.consumeMatching(UserCreatedEvent.class))
                 ))
                 .execute();
