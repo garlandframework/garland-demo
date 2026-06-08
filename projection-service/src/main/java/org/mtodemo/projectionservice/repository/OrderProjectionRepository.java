@@ -1,6 +1,6 @@
-package org.mtodemo.projectionservice.repository;
+package dev.garlandframework.demo.projectionservice.repository;
 
-import org.mtodemo.projectionservice.document.OrderProjectionDocument;
+import dev.garlandframework.demo.projectionservice.document.OrderProjectionDocument;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

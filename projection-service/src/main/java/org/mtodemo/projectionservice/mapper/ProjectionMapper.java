@@ -1,14 +1,14 @@
-package org.mtodemo.projectionservice.mapper;
+package dev.garlandframework.demo.projectionservice.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mtodemo.projectionservice.document.AddressInfoDoc;
-import org.mtodemo.projectionservice.document.UserProjectionDocument;
-import org.mtodemo.projectionservice.document.VehicleInfoDoc;
-import org.mtodemo.projectionservice.event.AddressInfo;
-import org.mtodemo.projectionservice.event.UserCreatedEvent;
-import org.mtodemo.projectionservice.event.UserUpdatedEvent;
-import org.mtodemo.projectionservice.event.VehicleInfo;
+import dev.garlandframework.demo.projectionservice.document.AddressInfoDoc;
+import dev.garlandframework.demo.projectionservice.document.UserProjectionDocument;
+import dev.garlandframework.demo.projectionservice.document.VehicleInfoDoc;
+import dev.garlandframework.demo.projectionservice.event.AddressInfo;
+import dev.garlandframework.demo.projectionservice.event.UserCreatedEvent;
+import dev.garlandframework.demo.projectionservice.event.UserUpdatedEvent;
+import dev.garlandframework.demo.projectionservice.event.VehicleInfo;
 
 @Mapper(componentModel = "spring")
 public interface ProjectionMapper {

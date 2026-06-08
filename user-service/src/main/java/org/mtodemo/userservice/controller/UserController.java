@@ -1,12 +1,12 @@
-package org.mtodemo.userservice.controller;
+package dev.garlandframework.demo.userservice.controller;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
-import org.mtodemo.userservice.dto.UserDto;
-import org.mtodemo.userservice.dto.UserRequest;
-import org.mtodemo.userservice.service.UserService;
+import dev.garlandframework.demo.userservice.dto.UserDto;
+import dev.garlandframework.demo.userservice.dto.UserRequest;
+import dev.garlandframework.demo.userservice.service.UserService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

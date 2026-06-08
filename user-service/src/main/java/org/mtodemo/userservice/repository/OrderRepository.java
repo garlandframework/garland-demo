@@ -1,6 +1,6 @@
-package org.mtodemo.userservice.repository;
+package dev.garlandframework.demo.userservice.repository;
 
-import org.mtodemo.userservice.entity.OrderEntity;
+import dev.garlandframework.demo.userservice.entity.OrderEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

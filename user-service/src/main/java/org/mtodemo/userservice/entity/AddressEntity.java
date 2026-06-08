@@ -1,4 +1,4 @@
-package org.mtodemo.userservice.entity;
+package dev.garlandframework.demo.userservice.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

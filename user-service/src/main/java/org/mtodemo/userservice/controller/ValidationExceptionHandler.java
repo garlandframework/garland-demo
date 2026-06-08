@@ -1,4 +1,4 @@
-package org.mtodemo.userservice.controller;
+package dev.garlandframework.demo.userservice.controller;
 
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;

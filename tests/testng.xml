@@ -11,7 +11,7 @@
   Generated order tests drop into the same packages automatically.
   E2E test classes must be added explicitly to the E2E section below.
 -->
-<suite name="MTO Demo" verbose="1" parallel="false">
+<suite name="Garland Demo" verbose="1" parallel="false">
 
     <test name="Endpoint Tests">
         <packages>

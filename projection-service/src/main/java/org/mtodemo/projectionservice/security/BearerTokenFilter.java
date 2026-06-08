@@ -1,4 +1,4 @@
-package org.mtodemo.projectionservice.security;
+package dev.garlandframework.demo.projectionservice.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

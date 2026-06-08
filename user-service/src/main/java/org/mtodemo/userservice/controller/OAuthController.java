@@ -1,8 +1,8 @@
-package org.mtodemo.userservice.controller;
+package dev.garlandframework.demo.userservice.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.mtodemo.userservice.security.JwtService;
-import org.mtodemo.userservice.security.TokenResponse;
+import dev.garlandframework.demo.userservice.security.JwtService;
+import dev.garlandframework.demo.userservice.security.TokenResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

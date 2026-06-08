@@ -1,8 +1,8 @@
-package org.mtodemo.userservice.kafka;
+package dev.garlandframework.demo.userservice.kafka;
 
 import lombok.RequiredArgsConstructor;
-import org.mtodemo.userservice.event.OrderCancelledEvent;
-import org.mtodemo.userservice.event.OrderPlacedEvent;
+import dev.garlandframework.demo.userservice.event.OrderCancelledEvent;
+import dev.garlandframework.demo.userservice.event.OrderPlacedEvent;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 

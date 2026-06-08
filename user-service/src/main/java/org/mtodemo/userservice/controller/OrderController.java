@@ -1,10 +1,10 @@
-package org.mtodemo.userservice.controller;
+package dev.garlandframework.demo.userservice.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.mtodemo.userservice.dto.OrderDto;
-import org.mtodemo.userservice.dto.OrderRequest;
-import org.mtodemo.userservice.service.OrderService;
+import dev.garlandframework.demo.userservice.dto.OrderDto;
+import dev.garlandframework.demo.userservice.dto.OrderRequest;
+import dev.garlandframework.demo.userservice.service.OrderService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

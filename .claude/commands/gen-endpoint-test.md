@@ -9,7 +9,7 @@ Examples:
 - `/gen-endpoint-test DeleteUserApiTest — full suite`
 - `/gen-endpoint-test GetAllUsersApiTest — pagination happy path`
 
-Read `/Users/volodymyrkobryn/ModularTestOrchestrator/ModularTestOrchestrator/untitled/llm.md` first — it contains universal framework rules (pipeline syntax, Verify.allOf, temporal tolerance, anti-patterns).
+Read `/Users/volodymyrkobryn/garland/llm.md` first — it contains universal framework rules (pipeline syntax, Verify.allOf, temporal tolerance, anti-patterns).
 The rules below are specific to this project — real users replace these with their own factories, mappers, and constraints.
 
 ---
@@ -225,10 +225,10 @@ Verify.matching(new ErrorDto(404, "User not found"))
 ## Imports reference
 
 ```java
-import org.modulartestorchestrator.base.Pipeline;
-import org.modulartestorchestrator.base.checks.Verify;
-import org.modulartestorchestrator.http.model.HttpCallRequest;
-import org.modulartestorchestrator.http.model.HttpCallResponse;
+import dev.garlandframework.base.Pipeline;
+import dev.garlandframework.base.checks.Verify;
+import dev.garlandframework.http.model.HttpCallRequest;
+import dev.garlandframework.http.model.HttpCallResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.mtodemo.tests.support.base.BaseTest;
 import org.mtodemo.tests.support.common.dto.ErrorDto;

@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-This is the demo project for the Modular Test Orchestrator (MTO) framework. Two Spring Boot microservices (`user-service` on :8080, `projection-service` on :8081) connected through Kafka, tested end-to-end without mocking.
+This is the demo project for the Garland framework. Two Spring Boot microservices (`user-service` on :8080, `projection-service` on :8081) connected through Kafka, tested end-to-end without mocking.
 
 The **users** domain has a complete reference test suite. The **orders** domain is intentionally untested — it exists to be covered using the generation commands.
 
@@ -29,7 +29,7 @@ mvn clean package -DskipTests -pl user-service
 mvn clean package -DskipTests -pl projection-service
 ```
 
-Services depend on the MTO framework being installed locally. Build the framework first if needed: `mvn install` in the framework repo.
+Services depend on the Garland framework being installed locally. Build the framework first if needed: `mvn install` in the framework repo.
 
 Before the first test runs, `BaseTest.@BeforeSuite` executes a three-stage readiness gate:
 1. **Stage 1** — polls `/actuator/health` on both services (up to 120 s) until both report `status: UP`. Spring Boot only reports UP when its DB, Kafka, and MongoDB connections are all established.

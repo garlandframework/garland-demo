@@ -1,4 +1,4 @@
-package org.mtodemo.userservice.event;
+package dev.garlandframework.demo.userservice.event;
 
 import java.math.BigDecimal;
 import java.util.UUID;

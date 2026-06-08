@@ -1,13 +1,13 @@
-package org.mtodemo.userservice.mapper;
+package dev.garlandframework.demo.userservice.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mtodemo.userservice.dto.OrderDto;
-import org.mtodemo.userservice.dto.OrderItemDto;
-import org.mtodemo.userservice.dto.OrderItemRequest;
-import org.mtodemo.userservice.dto.OrderRequest;
-import org.mtodemo.userservice.entity.OrderEntity;
-import org.mtodemo.userservice.entity.OrderItemEntity;
+import dev.garlandframework.demo.userservice.dto.OrderDto;
+import dev.garlandframework.demo.userservice.dto.OrderItemDto;
+import dev.garlandframework.demo.userservice.dto.OrderItemRequest;
+import dev.garlandframework.demo.userservice.dto.OrderRequest;
+import dev.garlandframework.demo.userservice.entity.OrderEntity;
+import dev.garlandframework.demo.userservice.entity.OrderItemEntity;
 
 @Mapper(componentModel = "spring")
 public interface OrderMapper {

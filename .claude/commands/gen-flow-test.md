@@ -11,7 +11,7 @@ Examples:
 - `/gen-flow-test UserFlowTest — full CRUD sequence`
 - `/gen-flow-test UserFlowTest — delete removes user from get-all`
 
-Universal framework rules are in `llm.md` in the MTO repo root.
+Universal framework rules are in `llm.md` in the Garland repo root.
 The rules below are specific to this project.
 
 ---
@@ -139,8 +139,8 @@ public void createThenDelete_thenGetAll_doesNotContainUser() throws Exception {
 
 ```java
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.modulartestorchestrator.base.Pipeline;
-import org.modulartestorchestrator.base.checks.Verify;
+import dev.garlandframework.base.Pipeline;
+import dev.garlandframework.base.checks.Verify;
 import org.mtodemo.tests.support.base.BaseTest;
 import org.mtodemo.tests.support.common.dto.ErrorDto;
 import org.mtodemo.tests.support.users.dto.UserDto;

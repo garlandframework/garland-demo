@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.mtodemo</groupId>
-        <artifactId>mto-demo</artifactId>
+        <groupId>dev.garlandframework.demo</groupId>
+        <artifactId>garland-demo</artifactId>
         <version>0.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
@@ -23,28 +23,28 @@
     <dependencies>
         <!-- framework modules -->
         <dependency>
-            <groupId>org.modulartestorchestrator.http</groupId>
-            <artifactId>http</artifactId>
+            <groupId>dev.garlandframework</groupId>
+            <artifactId>garland-http</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>org.modulartestorchestrator.postgres</groupId>
-            <artifactId>postgres</artifactId>
+            <groupId>dev.garlandframework</groupId>
+            <artifactId>garland-postgres</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>org.modulartestorchestrator.kafka</groupId>
-            <artifactId>kafka</artifactId>
+            <groupId>dev.garlandframework</groupId>
+            <artifactId>garland-kafka</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>org.modulartestorchestrator.mongodb</groupId>
-            <artifactId>mongodb</artifactId>
+            <groupId>dev.garlandframework</groupId>
+            <artifactId>garland-mongodb</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>org.modulartestorchestrator.testng</groupId>
-            <artifactId>testng-support</artifactId>
+            <groupId>dev.garlandframework</groupId>
+            <artifactId>garland-testng</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
 

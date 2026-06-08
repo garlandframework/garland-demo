@@ -1,3 +1,3 @@
-package org.mtodemo.userservice.security;
+package dev.garlandframework.demo.userservice.security;
 
 public record TokenResponse(String token) {}

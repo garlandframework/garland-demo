@@ -10,7 +10,7 @@ Examples:
 - `/gen-component-test UserApiToKafkaTest — create user publishes event`
 - `/gen-component-test KafkaToProjectionTest — event projected to MongoDB`
 
-Read `/Users/volodymyrkobryn/ModularTestOrchestrator/ModularTestOrchestrator/untitled/llm.md` first — it contains universal framework rules (pipeline syntax, Verify.allOf, temporal tolerance, anti-patterns).
+Read `/Users/volodymyrkobryn/garland/llm.md` first — it contains universal framework rules (pipeline syntax, Verify.allOf, temporal tolerance, anti-patterns).
 The rules below are specific to this project.
 
 ---
@@ -118,9 +118,9 @@ Component tests share the Kafka topic with other test levels. Run them sequentia
 ## Imports reference
 
 ```java
-import org.modulartestorchestrator.base.Pipeline;
-import org.modulartestorchestrator.base.checks.Verify;
-import org.modulartestorchestrator.kafka.model.KafkaMessage;
+import dev.garlandframework.base.Pipeline;
+import dev.garlandframework.base.checks.Verify;
+import dev.garlandframework.kafka.model.KafkaMessage;
 import org.mtodemo.tests.support.base.BaseTest;
 import org.mtodemo.tests.support.users.document.UserProjectionDoc;
 import org.mtodemo.tests.support.users.dto.UserDto;

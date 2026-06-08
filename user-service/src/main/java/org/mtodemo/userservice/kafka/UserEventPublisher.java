@@ -1,9 +1,9 @@
-package org.mtodemo.userservice.kafka;
+package dev.garlandframework.demo.userservice.kafka;
 
 import lombok.RequiredArgsConstructor;
-import org.mtodemo.userservice.event.UserCreatedEvent;
-import org.mtodemo.userservice.event.UserDeletedEvent;
-import org.mtodemo.userservice.event.UserUpdatedEvent;
+import dev.garlandframework.demo.userservice.event.UserCreatedEvent;
+import dev.garlandframework.demo.userservice.event.UserDeletedEvent;
+import dev.garlandframework.demo.userservice.event.UserUpdatedEvent;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 

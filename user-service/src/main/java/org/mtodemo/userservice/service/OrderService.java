@@ -1,15 +1,15 @@
-package org.mtodemo.userservice.service;
+package dev.garlandframework.demo.userservice.service;
 
 import lombok.RequiredArgsConstructor;
-import org.mtodemo.userservice.dto.OrderDto;
-import org.mtodemo.userservice.dto.OrderRequest;
-import org.mtodemo.userservice.dto.OrderStatus;
-import org.mtodemo.userservice.entity.OrderEntity;
-import org.mtodemo.userservice.kafka.OrderEventPublisher;
-import org.mtodemo.userservice.mapper.OrderEventMapper;
-import org.mtodemo.userservice.mapper.OrderMapper;
-import org.mtodemo.userservice.repository.OrderRepository;
-import org.mtodemo.userservice.repository.UserRepository;
+import dev.garlandframework.demo.userservice.dto.OrderDto;
+import dev.garlandframework.demo.userservice.dto.OrderRequest;
+import dev.garlandframework.demo.userservice.dto.OrderStatus;
+import dev.garlandframework.demo.userservice.entity.OrderEntity;
+import dev.garlandframework.demo.userservice.kafka.OrderEventPublisher;
+import dev.garlandframework.demo.userservice.mapper.OrderEventMapper;
+import dev.garlandframework.demo.userservice.mapper.OrderMapper;
+import dev.garlandframework.demo.userservice.repository.OrderRepository;
+import dev.garlandframework.demo.userservice.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

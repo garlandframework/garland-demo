@@ -4,11 +4,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.mtodemo</groupId>
-    <artifactId>mto-demo</artifactId>
+    <groupId>dev.garlandframework.demo</groupId>
+    <artifactId>garland-demo</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>mto-demo</name>
+    <name>garland-demo</name>
 
     <modules>
         <module>user-service</module>

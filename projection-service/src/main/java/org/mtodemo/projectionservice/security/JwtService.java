@@ -1,4 +1,4 @@
-package org.mtodemo.projectionservice.security;
+package dev.garlandframework.demo.projectionservice.security;
 
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;

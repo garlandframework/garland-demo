@@ -1,4 +1,4 @@
-package org.mtodemo.userservice.security;
+package dev.garlandframework.demo.userservice.security;
 
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;

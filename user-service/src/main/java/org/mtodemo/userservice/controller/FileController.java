@@ -1,6 +1,6 @@
-package org.mtodemo.userservice.controller;
+package dev.garlandframework.demo.userservice.controller;
 
-import org.mtodemo.userservice.dto.FileUploadResponse;
+import dev.garlandframework.demo.userservice.dto.FileUploadResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

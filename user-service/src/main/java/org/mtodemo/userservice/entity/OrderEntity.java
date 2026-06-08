@@ -1,9 +1,9 @@
-package org.mtodemo.userservice.entity;
+package dev.garlandframework.demo.userservice.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.mtodemo.userservice.dto.OrderStatus;
+import dev.garlandframework.demo.userservice.dto.OrderStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;

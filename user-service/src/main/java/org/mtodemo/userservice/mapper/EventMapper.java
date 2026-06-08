@@ -1,14 +1,14 @@
-package org.mtodemo.userservice.mapper;
+package dev.garlandframework.demo.userservice.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mtodemo.userservice.entity.AddressEntity;
-import org.mtodemo.userservice.entity.CarEntity;
-import org.mtodemo.userservice.entity.UserEntity;
-import org.mtodemo.userservice.event.AddressInfo;
-import org.mtodemo.userservice.event.UserCreatedEvent;
-import org.mtodemo.userservice.event.UserUpdatedEvent;
-import org.mtodemo.userservice.event.VehicleInfo;
+import dev.garlandframework.demo.userservice.entity.AddressEntity;
+import dev.garlandframework.demo.userservice.entity.CarEntity;
+import dev.garlandframework.demo.userservice.entity.UserEntity;
+import dev.garlandframework.demo.userservice.event.AddressInfo;
+import dev.garlandframework.demo.userservice.event.UserCreatedEvent;
+import dev.garlandframework.demo.userservice.event.UserUpdatedEvent;
+import dev.garlandframework.demo.userservice.event.VehicleInfo;
 
 @Mapper(componentModel = "spring")
 public interface EventMapper {

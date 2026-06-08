@@ -1,3 +1,3 @@
-package org.mtodemo.userservice.dto;
+package dev.garlandframework.demo.userservice.dto;
 
 public record FileUploadResponse(String filename, long size) {}

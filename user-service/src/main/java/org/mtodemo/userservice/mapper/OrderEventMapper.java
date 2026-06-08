@@ -1,12 +1,12 @@
-package org.mtodemo.userservice.mapper;
+package dev.garlandframework.demo.userservice.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mtodemo.userservice.entity.OrderEntity;
-import org.mtodemo.userservice.entity.OrderItemEntity;
-import org.mtodemo.userservice.event.OrderCancelledEvent;
-import org.mtodemo.userservice.event.OrderItemInfo;
-import org.mtodemo.userservice.event.OrderPlacedEvent;
+import dev.garlandframework.demo.userservice.entity.OrderEntity;
+import dev.garlandframework.demo.userservice.entity.OrderItemEntity;
+import dev.garlandframework.demo.userservice.event.OrderCancelledEvent;
+import dev.garlandframework.demo.userservice.event.OrderItemInfo;
+import dev.garlandframework.demo.userservice.event.OrderPlacedEvent;
 
 @Mapper(componentModel = "spring")
 public interface OrderEventMapper {

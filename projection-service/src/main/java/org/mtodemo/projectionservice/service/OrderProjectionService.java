@@ -1,11 +1,11 @@
-package org.mtodemo.projectionservice.service;
+package dev.garlandframework.demo.projectionservice.service;
 
 import lombok.RequiredArgsConstructor;
-import org.mtodemo.projectionservice.document.OrderProjectionDocument;
-import org.mtodemo.projectionservice.event.OrderCancelledEvent;
-import org.mtodemo.projectionservice.event.OrderPlacedEvent;
-import org.mtodemo.projectionservice.mapper.OrderProjectionMapper;
-import org.mtodemo.projectionservice.repository.OrderProjectionRepository;
+import dev.garlandframework.demo.projectionservice.document.OrderProjectionDocument;
+import dev.garlandframework.demo.projectionservice.event.OrderCancelledEvent;
+import dev.garlandframework.demo.projectionservice.event.OrderPlacedEvent;
+import dev.garlandframework.demo.projectionservice.mapper.OrderProjectionMapper;
+import dev.garlandframework.demo.projectionservice.repository.OrderProjectionRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;

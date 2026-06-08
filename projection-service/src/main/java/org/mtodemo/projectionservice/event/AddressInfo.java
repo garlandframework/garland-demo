@@ -1,4 +1,4 @@
-package org.mtodemo.projectionservice.event;
+package dev.garlandframework.demo.projectionservice.event;
 
 import java.util.UUID;
 

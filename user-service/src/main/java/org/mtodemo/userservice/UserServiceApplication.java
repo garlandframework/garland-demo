@@ -1,4 +1,4 @@
-package org.mtodemo.userservice;
+package dev.garlandframework.demo.userservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

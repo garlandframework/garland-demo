@@ -1,11 +1,11 @@
-package org.mtodemo.projectionservice.service;
+package dev.garlandframework.demo.projectionservice.service;
 
 import lombok.RequiredArgsConstructor;
-import org.mtodemo.projectionservice.document.UserProjectionDocument;
-import org.mtodemo.projectionservice.event.UserCreatedEvent;
-import org.mtodemo.projectionservice.event.UserUpdatedEvent;
-import org.mtodemo.projectionservice.mapper.ProjectionMapper;
-import org.mtodemo.projectionservice.repository.UserProjectionRepository;
+import dev.garlandframework.demo.projectionservice.document.UserProjectionDocument;
+import dev.garlandframework.demo.projectionservice.event.UserCreatedEvent;
+import dev.garlandframework.demo.projectionservice.event.UserUpdatedEvent;
+import dev.garlandframework.demo.projectionservice.mapper.ProjectionMapper;
+import dev.garlandframework.demo.projectionservice.repository.UserProjectionRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;

@@ -1,11 +1,11 @@
-package org.mtodemo.projectionservice.mapper;
+package dev.garlandframework.demo.projectionservice.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mtodemo.projectionservice.document.OrderItemDoc;
-import org.mtodemo.projectionservice.document.OrderProjectionDocument;
-import org.mtodemo.projectionservice.event.OrderItemInfo;
-import org.mtodemo.projectionservice.event.OrderPlacedEvent;
+import dev.garlandframework.demo.projectionservice.document.OrderItemDoc;
+import dev.garlandframework.demo.projectionservice.document.OrderProjectionDocument;
+import dev.garlandframework.demo.projectionservice.event.OrderItemInfo;
+import dev.garlandframework.demo.projectionservice.event.OrderPlacedEvent;
 
 @Mapper(componentModel = "spring")
 public interface OrderProjectionMapper {

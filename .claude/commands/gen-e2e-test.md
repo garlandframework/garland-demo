@@ -11,7 +11,7 @@ Examples:
 - `/gen-e2e-test UserEndToEndTest — update propagates to MongoDB`
 - `/gen-e2e-test UserEndToEndTest — delete removes from all systems`
 
-Read `/Users/volodymyrkobryn/ModularTestOrchestrator/ModularTestOrchestrator/untitled/llm.md` first — it contains universal framework rules (pipeline syntax, Verify.allOf, temporal tolerance, anti-patterns).
+Read `/Users/volodymyrkobryn/garland/llm.md` first — it contains universal framework rules (pipeline syntax, Verify.allOf, temporal tolerance, anti-patterns).
 The rules below are specific to this project.
 
 ---
@@ -246,8 +246,8 @@ TestUsers.requiredFieldsOnlyUser()         // name + surname only
 ## Imports reference
 
 ```java
-import org.modulartestorchestrator.base.Pipeline;
-import org.modulartestorchestrator.base.checks.Verify;
+import dev.garlandframework.base.Pipeline;
+import dev.garlandframework.base.checks.Verify;
 import org.mtodemo.tests.support.base.BaseTest;
 import org.mtodemo.tests.support.users.dto.UserDto;
 import org.mtodemo.tests.support.users.event.UserCreatedEvent;

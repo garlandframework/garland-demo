@@ -1,11 +1,11 @@
-package org.mtodemo.projectionservice.kafka;
+package dev.garlandframework.demo.projectionservice.kafka;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.mtodemo.projectionservice.event.OrderCancelledEvent;
-import org.mtodemo.projectionservice.event.OrderPlacedEvent;
-import org.mtodemo.projectionservice.service.OrderProjectionService;
+import dev.garlandframework.demo.projectionservice.event.OrderCancelledEvent;
+import dev.garlandframework.demo.projectionservice.event.OrderPlacedEvent;
+import dev.garlandframework.demo.projectionservice.service.OrderProjectionService;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 

@@ -1,4 +1,4 @@
-package org.mtodemo.projectionservice.document;
+package dev.garlandframework.demo.projectionservice.document;
 
 import lombok.*;
 

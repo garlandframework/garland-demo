@@ -1,10 +1,10 @@
-package org.mtodemo.projectionservice.controller;
+package dev.garlandframework.demo.projectionservice.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.mtodemo.projectionservice.document.OrderProjectionDocument;
-import org.mtodemo.projectionservice.document.UserProjectionDocument;
-import org.mtodemo.projectionservice.service.OrderProjectionService;
-import org.mtodemo.projectionservice.service.ProjectionService;
+import dev.garlandframework.demo.projectionservice.document.OrderProjectionDocument;
+import dev.garlandframework.demo.projectionservice.document.UserProjectionDocument;
+import dev.garlandframework.demo.projectionservice.service.OrderProjectionService;
+import dev.garlandframework.demo.projectionservice.service.ProjectionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

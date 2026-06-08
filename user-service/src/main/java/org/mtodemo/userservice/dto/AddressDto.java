@@ -1,4 +1,4 @@
-package org.mtodemo.userservice.dto;
+package dev.garlandframework.demo.userservice.dto;
 
 import java.util.UUID;
 

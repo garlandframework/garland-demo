@@ -1,4 +1,4 @@
-package org.mtodemo.userservice.event;
+package dev.garlandframework.demo.userservice.event;
 
 import java.time.Instant;
 import java.util.List;

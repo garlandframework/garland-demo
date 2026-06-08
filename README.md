@@ -1,8 +1,8 @@
-# MTO Demo
+# Garland Demo
 
-A working demo for the [Modular Test Orchestrator](https://github.com/vkobryn/modular-test-orchestrator) framework.
+A working demo for the [Garland](https://github.com/garlandframework/garland) framework.
 
-Two Spring Boot microservices connected through Kafka, with a complete integration test suite written with MTO. The **users** domain has a full reference test suite. The **orders** domain is intentionally left without tests — it exists to be tested using the generation commands.
+Two Spring Boot microservices connected through Kafka, with a complete integration test suite written with Garland. The **users** domain has a full reference test suite. The **orders** domain is intentionally left without tests — it exists to be tested using the generation commands.
 
 ---
 
@@ -38,7 +38,7 @@ Two Spring Boot microservices connected through Kafka, with a complete integrati
 - Java 21
 - Maven
 - Docker + Docker Compose
-- MTO framework built locally (`mvn install` in the framework repo)
+- Garland framework built locally (`mvn install` in the [framework repo](https://github.com/garlandframework/garland))
 
 ---
 
@@ -71,7 +71,7 @@ All tests run against live services. No mocking.
 
 ## Test suite structure
 
-Tests live in `tests/src/test/java/org/mtodemo/tests/`.
+Tests live in `tests/src/test/java/dev/garlandframework/demo/tests/`.
 
 Four test levels, each covering a different slice of the system:
 
@@ -109,7 +109,7 @@ The test suite acquires the token automatically in `@BeforeSuite`. Credentials a
 
 `user-service` has a full orders API (`POST /api/orders`, `GET`, `PUT /{id}/cancel`). `projection-service` projects order events to MongoDB. No tests exist for this domain.
 
-This is intentional — it is the domain to practice test generation with MTO.
+This is intentional — it is the domain to practice test generation with Garland.
 
 Use the Claude Code generation commands inside the `tests` module:
 
