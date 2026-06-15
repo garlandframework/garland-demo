@@ -37,7 +37,7 @@ Two Spring Boot microservices connected through Kafka, with a complete integrati
 
 ## Prerequisites
 
-- Java 21
+- Java 17
 - Maven
 - Docker + Docker Compose
 - Garland framework built locally (`mvn install` in the [framework repo](https://github.com/garlandframework/garland))
