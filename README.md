@@ -40,7 +40,6 @@ Two Spring Boot microservices connected through Kafka, with a complete integrati
 - Java 17
 - Maven
 - Docker + Docker Compose
-- Garland framework built locally (`mvn install` in the [framework repo](https://github.com/garlandframework/garland))
 
 ---
 
