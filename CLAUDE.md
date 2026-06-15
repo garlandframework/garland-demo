@@ -65,13 +65,6 @@ tests/src/test/java/dev/garlandframework/demo/tests/
       event/            UserCreatedEvent, UserUpdatedEvent, UserDeletedEvent, AddressInfo, VehicleInfo
       factory/          TestUsers, TestAddresses, TestCars, TestUserRequests, TestUserEvents
       mapper/           UserTestMapper
-    orders/
-      dto/              OrderDto, OrderItemDto, OrderStatus
-      entity/           OrderEntity, OrderItemEntity
-      document/         OrderProjectionDoc, OrderItemDoc
-      event/            OrderPlacedEvent, OrderCancelledEvent, OrderItemInfo
-      factory/          TestOrders, TestOrderItems, TestOrderRequests, TestOrderEvents
-      mapper/           OrderTestMapper
     common/
       dto/              ErrorDto, ValidationErrorDto, FieldViolationDto, LoginRequest, TokenDto
       factory/          TestAuthRequests
@@ -85,7 +78,7 @@ tests/src/test/java/dev/garlandframework/demo/tests/
 
 Key infrastructure files:
 - `support/base/Connections.java` — all host/port/credential constants
-- `support/base/BaseTest.java` — `@BeforeSuite` wires up all clients (HTTP, DB, Kafka×2, Mongo) and acquires JWT
+- `support/base/BaseTest.java` — `@BeforeSuite` wires up all clients (HTTP, DB, Kafka, Mongo) and acquires JWT
 - `support/base/EnvironmentReadinessChecker.java` — three-stage startup gate (health → JWT → smoke probe)
 - `support/base/TestLogger.java` — TestNG listener, logs per-test pass/fail
 
