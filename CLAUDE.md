@@ -55,7 +55,7 @@ restart-clean.sh     Rebuild + restart helper
 ## Test module layout
 
 ```
-tests/src/test/java/org/mtodemo/tests/
+tests/src/test/java/dev/garlandframework/demo/tests/
   support/
     base/               BaseTest, Connections, TestLogger, EnvironmentReadinessChecker
     users/

@@ -18,7 +18,7 @@ The rules below are specific to this project.
 ## Project layout
 
 ```
-tests/src/test/java/org/mtodemo/tests/
+tests/src/test/java/dev/garlandframework/demo/tests/
   users/
     endpoint/      ← single endpoint tests (/gen-endpoint-test)
     flow/          ← multi-step sequences within user-service (/gen-flow-test)
@@ -28,7 +28,7 @@ tests/src/test/java/org/mtodemo/tests/
 
 ## Package
 
-`org.mtodemo.tests.users.component`
+`dev.garlandframework.demo.tests.users.component`
 
 ## Two component slices
 
@@ -121,17 +121,17 @@ Component tests share the Kafka topic with other test levels. Run them sequentia
 import dev.garlandframework.base.Pipeline;
 import dev.garlandframework.base.checks.Verify;
 import dev.garlandframework.kafka.model.KafkaMessage;
-import org.mtodemo.tests.support.base.BaseTest;
-import org.mtodemo.tests.support.users.document.UserProjectionDoc;
-import org.mtodemo.tests.support.users.dto.UserDto;
-import org.mtodemo.tests.support.users.event.UserCreatedEvent;
-import org.mtodemo.tests.support.users.factory.TestUserEvents;
-import org.mtodemo.tests.support.users.factory.TestUserRequests;
-import org.mtodemo.tests.support.users.mapper.UserTestMapper;
-import org.mtodemo.tests.support.orders.document.OrderProjectionDoc;
-import org.mtodemo.tests.support.orders.event.OrderPlacedEvent;
-import org.mtodemo.tests.support.orders.factory.TestOrderEvents;
-import org.mtodemo.tests.support.orders.mapper.OrderTestMapper;
+import dev.garlandframework.demo.tests.support.base.BaseTest;
+import dev.garlandframework.demo.tests.support.users.document.UserProjectionDoc;
+import dev.garlandframework.demo.tests.support.users.dto.UserDto;
+import dev.garlandframework.demo.tests.support.users.event.UserCreatedEvent;
+import dev.garlandframework.demo.tests.support.users.factory.TestUserEvents;
+import dev.garlandframework.demo.tests.support.users.factory.TestUserRequests;
+import dev.garlandframework.demo.tests.support.users.mapper.UserTestMapper;
+import dev.garlandframework.demo.tests.support.orders.document.OrderProjectionDoc;
+import dev.garlandframework.demo.tests.support.orders.event.OrderPlacedEvent;
+import dev.garlandframework.demo.tests.support.orders.factory.TestOrderEvents;
+import dev.garlandframework.demo.tests.support.orders.mapper.OrderTestMapper;
 import org.testng.annotations.Test;
 import java.time.Duration;
 ```

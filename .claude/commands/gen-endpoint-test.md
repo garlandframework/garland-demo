@@ -17,7 +17,7 @@ The rules below are specific to this project — real users replace these with t
 ## Project layout
 
 ```
-tests/src/test/java/org/mtodemo/tests/
+tests/src/test/java/dev/garlandframework/demo/tests/
   users/
     endpoint/   ← single endpoint tests (this skill)
     flow/       ← multi-step sequence tests (/gen-flow-test)
@@ -25,8 +25,8 @@ tests/src/test/java/org/mtodemo/tests/
     UserEndToEndTest.java  ← full cross-system chain
 ```
 
-- Endpoint tests live in `org.mtodemo.tests.users.endpoint`
-- All test classes extend `BaseTest` (`org.mtodemo.tests.support.base.BaseTest`)
+- Endpoint tests live in `dev.garlandframework.demo.tests.users.endpoint`
+- All test classes extend `BaseTest` (`dev.garlandframework.demo.tests.support.base.BaseTest`)
 - `@Listeners(TestLogger.class)` is inherited from `BaseTest` — do NOT add it again
 
 ## Clients (from BaseTest)
@@ -230,20 +230,20 @@ import dev.garlandframework.base.checks.Verify;
 import dev.garlandframework.http.model.HttpCallRequest;
 import dev.garlandframework.http.model.HttpCallResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.mtodemo.tests.support.base.BaseTest;
-import org.mtodemo.tests.support.common.dto.ErrorDto;
-import org.mtodemo.tests.support.common.dto.FieldViolationDto;
-import org.mtodemo.tests.support.common.dto.LoginRequest;
-import org.mtodemo.tests.support.common.dto.TokenDto;
-import org.mtodemo.tests.support.common.dto.ValidationErrorDto;
-import org.mtodemo.tests.support.common.factory.TestAuthRequests;
-import org.mtodemo.tests.support.common.factory.TestFileRequests;
-import org.mtodemo.tests.support.users.dto.UserDto;
-import org.mtodemo.tests.support.users.factory.TestAddresses;
-import org.mtodemo.tests.support.users.factory.TestCars;
-import org.mtodemo.tests.support.users.factory.TestUserRequests;
-import org.mtodemo.tests.support.users.factory.TestUsers;
-import org.mtodemo.tests.support.users.mapper.UserTestMapper;
+import dev.garlandframework.demo.tests.support.base.BaseTest;
+import dev.garlandframework.demo.tests.support.common.dto.ErrorDto;
+import dev.garlandframework.demo.tests.support.common.dto.FieldViolationDto;
+import dev.garlandframework.demo.tests.support.common.dto.LoginRequest;
+import dev.garlandframework.demo.tests.support.common.dto.TokenDto;
+import dev.garlandframework.demo.tests.support.common.dto.ValidationErrorDto;
+import dev.garlandframework.demo.tests.support.common.factory.TestAuthRequests;
+import dev.garlandframework.demo.tests.support.common.factory.TestFileRequests;
+import dev.garlandframework.demo.tests.support.users.dto.UserDto;
+import dev.garlandframework.demo.tests.support.users.factory.TestAddresses;
+import dev.garlandframework.demo.tests.support.users.factory.TestCars;
+import dev.garlandframework.demo.tests.support.users.factory.TestUserRequests;
+import dev.garlandframework.demo.tests.support.users.factory.TestUsers;
+import dev.garlandframework.demo.tests.support.users.mapper.UserTestMapper;
 import org.testng.annotations.Test;
 import java.util.List;
 import java.util.Map;

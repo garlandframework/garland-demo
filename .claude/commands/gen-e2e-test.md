@@ -19,7 +19,7 @@ The rules below are specific to this project.
 ## Project layout
 
 ```
-tests/src/test/java/org/mtodemo/tests/
+tests/src/test/java/dev/garlandframework/demo/tests/
   users/
     endpoint/            ← single endpoint tests (/gen-endpoint-test)
     flow/                ← multi-step sequences within user-service (/gen-flow-test)
@@ -27,7 +27,7 @@ tests/src/test/java/org/mtodemo/tests/
     UserEndToEndTest.java  ← full cross-system chain (this skill)
 ```
 
-- E2e test classes live directly in `org.mtodemo.tests.users` (not a subdirectory)
+- E2e test classes live directly in `dev.garlandframework.demo.tests.users` (not a subdirectory)
 - Class name convention: `<Domain>EndToEndTest`
 - All test classes extend `BaseTest`
 
@@ -248,20 +248,20 @@ TestUsers.requiredFieldsOnlyUser()         // name + surname only
 ```java
 import dev.garlandframework.base.Pipeline;
 import dev.garlandframework.base.checks.Verify;
-import org.mtodemo.tests.support.base.BaseTest;
-import org.mtodemo.tests.support.users.dto.UserDto;
-import org.mtodemo.tests.support.users.event.UserCreatedEvent;
-import org.mtodemo.tests.support.users.event.UserDeletedEvent;
-import org.mtodemo.tests.support.users.event.UserUpdatedEvent;
-import org.mtodemo.tests.support.users.factory.TestUserRequests;
-import org.mtodemo.tests.support.users.factory.TestUsers;
-import org.mtodemo.tests.support.users.mapper.UserTestMapper;
-import org.mtodemo.tests.support.orders.dto.OrderDto;
-import org.mtodemo.tests.support.orders.event.OrderPlacedEvent;
-import org.mtodemo.tests.support.orders.event.OrderCancelledEvent;
-import org.mtodemo.tests.support.orders.factory.TestOrderRequests;
-import org.mtodemo.tests.support.orders.factory.TestOrders;
-import org.mtodemo.tests.support.orders.mapper.OrderTestMapper;
+import dev.garlandframework.demo.tests.support.base.BaseTest;
+import dev.garlandframework.demo.tests.support.users.dto.UserDto;
+import dev.garlandframework.demo.tests.support.users.event.UserCreatedEvent;
+import dev.garlandframework.demo.tests.support.users.event.UserDeletedEvent;
+import dev.garlandframework.demo.tests.support.users.event.UserUpdatedEvent;
+import dev.garlandframework.demo.tests.support.users.factory.TestUserRequests;
+import dev.garlandframework.demo.tests.support.users.factory.TestUsers;
+import dev.garlandframework.demo.tests.support.users.mapper.UserTestMapper;
+import dev.garlandframework.demo.tests.support.orders.dto.OrderDto;
+import dev.garlandframework.demo.tests.support.orders.event.OrderPlacedEvent;
+import dev.garlandframework.demo.tests.support.orders.event.OrderCancelledEvent;
+import dev.garlandframework.demo.tests.support.orders.factory.TestOrderRequests;
+import dev.garlandframework.demo.tests.support.orders.factory.TestOrders;
+import dev.garlandframework.demo.tests.support.orders.mapper.OrderTestMapper;
 import org.testng.annotations.Test;
 import java.time.Duration;
 import java.time.Instant;
