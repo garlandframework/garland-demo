@@ -7,9 +7,6 @@ import dev.garlandframework.base.tracker.ResourceTracker;
 import dev.garlandframework.http.HttpTestClient;
 import dev.garlandframework.demo.tests.support.common.dto.TokenDto;
 import dev.garlandframework.demo.tests.support.common.factory.TestAuthRequests;
-import dev.garlandframework.demo.tests.support.orders.document.OrderProjectionDoc;
-import dev.garlandframework.demo.tests.support.orders.dto.OrderDto;
-import dev.garlandframework.demo.tests.support.orders.factory.TestOrderRequests;
 import dev.garlandframework.demo.tests.support.users.document.UserProjectionDoc;
 import dev.garlandframework.demo.tests.support.users.dto.UserDto;
 import dev.garlandframework.demo.tests.support.users.entity.AddressEntity;
@@ -17,8 +14,6 @@ import dev.garlandframework.demo.tests.support.users.entity.CarEntity;
 import dev.garlandframework.demo.tests.support.users.entity.UserEntity;
 import dev.garlandframework.demo.tests.support.users.factory.TestUserRequests;
 import dev.garlandframework.demo.tests.support.users.mapper.UserTestMapper;
-import dev.garlandframework.demo.tests.support.orders.entity.OrderEntity;
-import dev.garlandframework.demo.tests.support.orders.entity.OrderItemEntity;
 import dev.garlandframework.kafka.KafkaConfig;
 import dev.garlandframework.kafka.KafkaTestClient;
 import dev.garlandframework.mongodb.MongoConfig;
@@ -47,17 +42,11 @@ public abstract class BaseTest extends AbstractGarlandBaseTest {
     protected static HttpTestClient httpClient;
     protected static PostgresTestClient postgresClient;
     protected static KafkaTestClient kafkaClient;
-    protected static KafkaTestClient orderKafkaClient;
     protected static MongoTestClient mongoClient;
 
     protected static PostgresWrapper postgres;
     protected static MongoWrapper mongo;
 
-    protected final ResourceTracker<UUID> orderTracker = new ResourceTracker<>(
-            id -> Pipeline.given(TestOrderRequests.cancelOrder(id))
-                          .then(httpClient.makeCall(200, OrderDto.class))
-                          .execute()
-    );
     protected final ResourceTracker<UUID> userTracker = new ResourceTracker<>(
             id -> Pipeline.given(TestUserRequests.deleteUser(id))
                           .then(httpClient.makeCall(204, Void.class))
@@ -65,15 +54,11 @@ public abstract class BaseTest extends AbstractGarlandBaseTest {
     );
 
     protected BaseTest() {
-        registerTrackers(orderTracker, userTracker);
+        registerTrackers(userTracker);
     }
 
     protected Step<UserDto, UserDto> trackUser() {
         return userTracker.track(UserDto::getUuid);
-    }
-
-    protected Step<OrderDto, OrderDto> trackOrder() {
-        return orderTracker.track(OrderDto::getUuid);
     }
 
     @BeforeSuite
@@ -96,8 +81,6 @@ public abstract class BaseTest extends AbstractGarlandBaseTest {
                         .entity(UserEntity.class)
                         .entity(AddressEntity.class)
                         .entity(CarEntity.class)
-                        .entity(OrderEntity.class)
-                        .entity(OrderItemEntity.class)
                         .build()
         );
         postgresClient = new PostgresTestClient(postgres, RetryConfig.of(5, Duration.ofSeconds(2)))
@@ -116,18 +99,6 @@ public abstract class BaseTest extends AbstractGarlandBaseTest {
         ).withTemporalTolerance(Duration.ofMillis(1));
         kafkaClient.warmup();
         log.info("  kafkaClient (user topics) assigned");
-
-        orderKafkaClient = new KafkaTestClient(
-                KafkaConfig.builder()
-                        .bootstrapServers(Connections.KAFKA_BOOTSTRAP_SERVERS)
-                        .topic(Connections.KAFKA_TOPIC_ORDER_PLACED)
-                        .topic(Connections.KAFKA_TOPIC_ORDER_CANCELLED)
-                        .groupId(UUID.randomUUID().toString())
-                        .build(),
-                RetryConfig.of(5, Duration.ofSeconds(2))
-        ).withTemporalTolerance(Duration.ofMillis(1));
-        orderKafkaClient.warmup();
-        log.info("  orderKafkaClient (order topics) assigned");
         log.info("=== Stage 2 passed: Kafka consumers have partition assignment ===");
 
         mongo = new MongoWrapper(
@@ -135,7 +106,6 @@ public abstract class BaseTest extends AbstractGarlandBaseTest {
                         .connectionString(Connections.MONGO_CONNECTION_STRING)
                         .database(Connections.MONGO_DATABASE)
                         .collection(UserProjectionDoc.class, "users")
-                        .collection(OrderProjectionDoc.class, "order_projections")
                         .build()
         );
         mongoClient = new MongoTestClient(mongo, RetryConfig.of(10, Duration.ofSeconds(2)))
@@ -181,14 +151,12 @@ public abstract class BaseTest extends AbstractGarlandBaseTest {
     @BeforeTest
     public void seekKafkaToLatest() {
         if (kafkaClient != null) kafkaClient.warmup();
-        if (orderKafkaClient != null) orderKafkaClient.warmup();
     }
 
     @AfterSuite
     public void tearDownSuite() {
         if (postgres != null) postgres.close();
         if (kafkaClient != null) kafkaClient.close();
-        if (orderKafkaClient != null) orderKafkaClient.close();
         if (mongo != null) mongo.close();
     }
 }

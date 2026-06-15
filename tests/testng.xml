@@ -16,28 +16,24 @@
     <test name="Endpoint Tests">
         <packages>
             <package name="dev.garlandframework.demo.tests.users.endpoint"/>
-            <package name="dev.garlandframework.demo.tests.orders.endpoint"/>
         </packages>
     </test>
 
     <test name="Flow Tests">
         <packages>
             <package name="dev.garlandframework.demo.tests.users.flow"/>
-            <package name="dev.garlandframework.demo.tests.orders.flow"/>
         </packages>
     </test>
 
     <test name="Component Tests">
         <packages>
             <package name="dev.garlandframework.demo.tests.users.component"/>
-            <package name="dev.garlandframework.demo.tests.orders.component"/>
         </packages>
     </test>
 
     <test name="E2E Tests">
         <classes>
             <class name="dev.garlandframework.demo.tests.users.UserEndToEndTest"/>
-            <!-- add dev.garlandframework.demo.tests.orders.OrderEndToEndTest when generated -->
         </classes>
     </test>
 
