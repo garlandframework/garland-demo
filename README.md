@@ -4,6 +4,8 @@ A working demo for the [Garland](https://github.com/garlandframework/garland) fr
 
 Two Spring Boot microservices connected through Kafka, with a complete integration test suite written with Garland. The **users** domain has a full reference test suite. The **orders** domain is intentionally left without tests — it exists to be tested using the generation commands.
 
+If Garland is helpful to you, please [give it a star ⭐](https://github.com/garlandframework/garland) — it helps others find the project.
+
 [![Watch the demo](https://img.youtube.com/vi/bN6O8ek2TjQ/0.jpg)](https://www.youtube.com/watch?v=bN6O8ek2TjQ)
 
 ---
